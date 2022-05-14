@@ -20,7 +20,7 @@ var minBrushSize = 1;
 // Higher numbers give a smoother stroke
 var brushDensity = 5;
 
-var showDebug = true;
+var showDebug = false;
 
 // Jitter smoothing parameters
 // See: http://cristal.univ-lille.fr/~casiez/1euro/
@@ -44,6 +44,21 @@ var isDrawing = false;
 var isDrawingJustStarted = false;
 
 
+/***************************
+*   Drawing data points    *
+****************************/
+
+let currentDrawing = []; // this array stores a collection of strokes 
+let currentStroke  = []; // each stroke is a coection of (x,y,pressure) sampled dover time
+
+/***********************
+*      UI BUTTONS      *
+************************/
+let clearButton;
+let loadImageButton;
+let saveAndClearButton;
+
+
 /***********************
 *    DRAWING CANVAS    *
 ************************/
@@ -63,6 +78,9 @@ new p5(function(p) {
     drawCanvas = p.createCanvas(p.windowWidth, p.windowHeight);
     drawCanvas.id("drawingCanvas");
     drawCanvas.position(0, 0);
+    p.background(255);
+
+    p.frameRate = 30;
   }
 
   p.draw = function() {
@@ -120,6 +138,8 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
+      currentStroke.push([p.mouseX, p.mouseY, pressure]);
+
       isDrawingJustStarted = false;
     }
 
@@ -136,6 +156,50 @@ new p5(function(p) {
       uiCanvas = p.createCanvas(p.windowWidth, p.windowHeight);
       uiCanvas.id("uiCanvas");
       uiCanvas.position(0, 0);
+
+      clearButton = p.createButton('Clear');
+      clearButton.position(10, 10);
+      clearButton.mousePressed(clearCanvas);
+
+      saveAndClearButton = p.createButton('Save and Clear');
+      saveAndClearButton.position(70, 10);
+      saveAndClearButton.mousePressed(saveAndCear);
+
+      loadImageButton = p.createButton('Load Image');
+      loadImageButton.position(190, 10);
+      loadImageButton.mousePressed(loadBackgroundImage);
+
+      p.noStroke();
+      p.fill(100)
+    }
+
+    loadBackgroundImage = function(){
+
+    }
+
+    saveAndCear = function() {
+      // save currentDrawing data
+      // ... 
+      console.log("saving current drawing.")
+
+      // add (0,0,0) as separator
+      let drawing = currentDrawing.reduce((r,a) => r.concat(a,Array([0,0,0])));
+      console.log(drawing.join());
+
+      // # Download image and text;
+      // p.saveCanvas(drawCanvas, 'myDrawing', 'jpg');
+      // let writer = p.createWriter('myDrawing.txt');
+      // writer.write(drawing.flat());
+      // writer.close();
+
+      clearCanvas();
+    }
+
+    clearCanvas = function(){
+      drawCanvas.clear();
+      uiCanvas.clear();
+      currentDrawing = [];
+      currentStroke = [];
     }
 
   	p.draw = function() {
@@ -145,12 +209,12 @@ new p5(function(p) {
       if(showDebug){
         p.text("pressure = " + pressure, 10, 20);
 
-        p.stroke(200,50);
-        p.line(p.mouseX,0,p.mouseX,p.height);
-        p.line(0,p.mouseY,p.width,p.mouseY);
+        // p.stroke(200,50);
+        // p.line(p.mouseX,0,p.mouseX,p.height);
+        // p.line(0,p.mouseY,p.width,p.mouseY);
 
-        p.noStroke();
-        p.fill(100)
+        // p.noStroke();
+        // p.fill(100)
         var w = p.width * pressure;
         p.rect(0, 0, w, 4);
       }
@@ -179,6 +243,11 @@ function initPressure() {
   		},
       end: function(){
     		// this is called on force end
+        if(isDrawing){
+          currentDrawing.push(currentStroke);
+          currentStroke = [];
+          // console.log(currentDrawing);
+        }
         isDrawing = false
         pressure = 0;
   		},
