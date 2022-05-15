@@ -13,11 +13,7 @@ router.get('/', (req, res) => {
 router.post('/drawing', (req, res) => {
   const dbConnect = dbo.getDb();
   
-  const drawingDocument = {
-    created: new Date(),
-    author: req.body.author,
-    drawing: req.body.drawing,
-  };
+  const drawingDocument = req.body;
 
   dbConnect
     .collection(DB_NAME)
