@@ -57,7 +57,7 @@ let currentStroke  = []; // each stroke is a coection of (x,y,pressure) sampled 
 let clearButton;
 let loadImageButton;
 let saveAndClearButton;
-
+let colorPicker;
 let author = '';
 
 /***********************
@@ -126,13 +126,13 @@ new p5(function(p) {
         x = p.lerp(prevPenX, penX, amt);
         y = p.lerp(prevPenY, penY, amt);
         p.noStroke();
-        p.fill(100)
+        p.fill(colorPicker.color());
         p.ellipse(x, y, s);
       }
 
       // Draw an ellipse at the latest position
       p.noStroke();
-      p.fill(100)
+      p.fill(colorPicker.color())
       p.ellipse(penX, penY, brushSize);
 
       // Save the latest brush values for next frame
@@ -140,7 +140,12 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
-      currentStroke.push([Date.now(), p.mouseX, p.mouseY, pressure]);
+      currentStroke.push({
+        timestamp: Date.now(), 
+        x: p.mouseX, 
+        y: p.mouseY, 
+        pressure: pressure
+      });
 
       isDrawingJustStarted = false;
     }
@@ -175,6 +180,9 @@ new p5(function(p) {
       changeAuthorButton.position(290, 10);
       changeAuthorButton.mousePressed(changeAuthor);
 
+      colorPicker = p.createColorPicker('#000000');
+      colorPicker.position(p.windowWidth - 200, 5);
+
       p.text("test", 500, 60);
 
       changeAuthor();
@@ -196,7 +204,7 @@ new p5(function(p) {
 
       // add (0,0,0) as separator
       // let drawing = currentDrawing.reduce((r,a) => r.concat(a,Array([0,0,0,0])));
-      let drawing = currentDrawing.reduce((r,a) => r.concat(a,"SEPARATOR"));
+      // let drawing = currentDrawing.reduce((r,a) => r.concat(a,"SEPARATOR"));
 
       console.log(currentDrawing);
       // console.log(drawing.join());
@@ -210,9 +218,9 @@ new p5(function(p) {
       fetch('/api/drawing', {
           method: 'POST',
           body: JSON.stringify({
-            created: Date.now(),
+            timestamp: Date.now(),
             author: author,
-            drawing: currentDrawing      
+            strokes: currentDrawing      
           }),
           headers: {
             Accept: 'application/json',
@@ -243,6 +251,9 @@ new p5(function(p) {
 
       uiCanvas.clear();
       p.text(author, 420, 25);
+
+      p.fill(colorPicker.color());
+      // p.rect(p.windowWidth-70, 10, 60,60);
 
       if(showDebug){
         p.text("pressure = " + pressure, 10, 60);
@@ -285,7 +296,11 @@ function initPressure() {
       end: function(){
     		// this is called on force end
         if(isDrawing){
-          currentDrawing.push([Date.now(),currentStroke]);
+          currentDrawing.push({
+            timestamp: Date.now(),
+            stroke: currentStroke,
+            color: colorPicker.color().levels             
+          });
           currentStroke = [];
           // console.log(currentDrawing);
         }
