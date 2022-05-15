@@ -23,7 +23,7 @@ module.exports = {
         return console.error(err);
       }
 
-      dbConnection = db.db(   );
+      dbConnection = db.db(DB_NAME);
       console.log("Successfully connected to MongoDB.");
     });
   },
