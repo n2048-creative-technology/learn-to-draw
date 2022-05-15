@@ -58,6 +58,7 @@ let clearButton;
 let loadImageButton;
 let saveAndClearButton;
 
+let author = '';
 
 /***********************
 *    DRAWING CANVAS    *
@@ -81,6 +82,7 @@ new p5(function(p) {
     p.background(255);
 
     p.frameRate = 30;
+
   }
 
   p.draw = function() {
@@ -169,8 +171,18 @@ new p5(function(p) {
       loadImageButton.position(190, 10);
       loadImageButton.mousePressed(loadBackgroundImage);
 
-      p.noStroke();
-      p.fill(100)
+      changeAuthorButton = p.createButton('Change Author');
+      changeAuthorButton.position(290, 10);
+      changeAuthorButton.mousePressed(changeAuthor);
+
+      p.text("test", 500, 60);
+
+      changeAuthor();
+
+    }
+
+    changeAuthor = function() {
+      author = prompt("What's your e-mail address");
     }
 
     loadBackgroundImage = function(){
@@ -199,7 +211,7 @@ new p5(function(p) {
           method: 'POST',
           body: JSON.stringify({
             created: Date.now(),
-            author:'mauricio@gmail.com',
+            author: author,
             drawing: currentDrawing      
           }),
           headers: {
@@ -230,9 +242,10 @@ new p5(function(p) {
   	p.draw = function() {
 
       uiCanvas.clear();
+      p.text(author, 420, 25);
 
       if(showDebug){
-        p.text("pressure = " + pressure, 10, 20);
+        p.text("pressure = " + pressure, 10, 60);
 
         // p.stroke(200,50);
         // p.line(p.mouseX,0,p.mouseX,p.height);
@@ -241,6 +254,9 @@ new p5(function(p) {
         // p.noStroke();
         // p.fill(100)
         var w = p.width * pressure;
+
+        p.fill(0)
+        p.stroke(0);
         p.rect(0, 0, w, 4);
       }
     }
