@@ -138,7 +138,7 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
-      currentStroke.push([p.mouseX, p.mouseY, pressure]);
+      currentStroke.push([Date.now(), p.mouseX, p.mouseY, pressure]);
 
       isDrawingJustStarted = false;
     }
@@ -183,8 +183,11 @@ new p5(function(p) {
       console.log("saving current drawing.")
 
       // add (0,0,0) as separator
-      let drawing = currentDrawing.reduce((r,a) => r.concat(a,Array([0,0,0])));
-      console.log(drawing.join());
+      // let drawing = currentDrawing.reduce((r,a) => r.concat(a,Array([0,0,0,0])));
+      let drawing = currentDrawing.reduce((r,a) => r.concat(a,"SEPARATOR"));
+
+      console.log(currentDrawing);
+      // console.log(drawing.join());
 
       // # Download image and text;
       // p.saveCanvas(drawCanvas, 'myDrawing', 'jpg');
@@ -244,7 +247,7 @@ function initPressure() {
       end: function(){
     		// this is called on force end
         if(isDrawing){
-          currentDrawing.push(currentStroke);
+          currentDrawing.push([Date.now(),currentStroke]);
           currentStroke = [];
           // console.log(currentDrawing);
         }
