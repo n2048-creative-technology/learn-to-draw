@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 
-const DB_USERNAME = process.env.DB_USERNAME || 'JeWSwxsp5uqerd1p'
-const DB_PASWORD = process.env.DB_PASWORD || '8erBv51wLlfDFf7g'
+const DB_USERNAME = process.env.DB_USERNAME || 'username'
+const DB_PASWORD = process.env.DB_PASWORD || 'password'
 const DB_HOST = process.env.DB_HOST || 'localhost'
 const DB_PORT = process.env.DB_PORT || '27017'
 const DB_NAME = process.env.DB_NAME || 'drawings'
