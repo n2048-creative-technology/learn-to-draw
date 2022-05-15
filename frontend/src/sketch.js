@@ -195,8 +195,30 @@ new p5(function(p) {
       // writer.write(drawing.flat());
       // writer.close();
 
-      clearCanvas();
-    }
+      fetch('/api/drawing', {
+          method: 'POST',
+          body: JSON.stringify({
+            created: Date.now(),
+            author:'mauricio@gmail.com',
+            drawing: currentDrawing      
+          }),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          if(response.ok) {
+            console.log('Drawing was added to the DB.');
+            return;
+          }
+          throw new Error('Request failed.');
+        }).catch(function(error) {
+          console.log(error);
+        });
+
+        clearCanvas();
+      }
+
 
     clearCanvas = function(){
       drawCanvas.clear();

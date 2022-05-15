@@ -11,4 +11,12 @@ router.get('/', (req, res) => {
 });
 
 
+router.post('/drawing', (req, res) => {
+  res.json({
+    message: 'Drawing saved!',
+    data: req.body
+  });
+});
+
+
 module.exports = router;
