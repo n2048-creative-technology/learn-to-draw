@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 
 const dbo = require('./db/connection');
+dbo.connectToServer();
 
 require('dotenv').config();
 
