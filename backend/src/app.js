@@ -3,7 +3,11 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 
+const dbo = require('./db/connection');
+
 require('dotenv').config();
+
+process.env.PORT 
 
 const middlewares = require('./middlewares');
 const api = require('./api');
