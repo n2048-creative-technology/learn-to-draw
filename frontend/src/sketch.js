@@ -172,9 +172,9 @@ new p5(function(p) {
       saveAndClearButton.position(70, 10);
       saveAndClearButton.mousePressed(saveAndCear);
 
-      loadImageButton = p.createButton('Load Image');
-      loadImageButton.position(190, 10);
-      loadImageButton.mousePressed(loadBackgroundImage);
+      // loadImageButton = p.createButton('Load Image');
+      // loadImageButton.position(190, 10);
+      // loadImageButton.mousePressed(loadBackgroundImage);
 
       changeAuthorButton = p.createButton('Change Author');
       changeAuthorButton.position(290, 10);
@@ -229,6 +229,7 @@ new p5(function(p) {
         }).then(function(response) {
           if(response.ok) {
             console.log('Drawing was added to the DB.');
+            alert('Drawing saved!');
             return;
           }
           throw new Error('Request failed.');
