@@ -230,14 +230,15 @@ new p5(function(p) {
           if(response.ok) {
             console.log('Drawing was added to the DB.');
             alert('Drawing saved!');
+            clearCanvas();
             return;
           }
           throw new Error('Request failed.');
         }).catch(function(error) {
+          alert('There was a problem saving the drawing. Try again!');
           console.log(error);
         });
 
-        clearCanvas();
       }
 
 
