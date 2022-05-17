@@ -15,6 +15,16 @@ const api = require('./api');
 
 const app = express();
 
+app.use(bodyParser.json({
+  limit: '1000mb',
+}));
+
+app.use(bodyParser.urlencoded({
+  limit: '1000mb',
+  parameterLimit: 100000,
+  extended: true 
+}));
+
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors());

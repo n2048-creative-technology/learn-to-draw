@@ -65,6 +65,9 @@ class Sketch {
   setAuthor(author){
     this.author = author.toLowerCase();
   }
+  getAuthor(){
+    return this.author;
+  }
 }
 class Stroke {
   strokeId;
@@ -282,7 +285,7 @@ new p5(function(p) {
   	p.draw = function() {
 
       uiCanvas.clear();
-      p.text(author, 420, 25);
+      p.text(sketch.getAuthor(), 420, 25);
 
       p.fill(colorPicker.color());
       // p.rect(p.windowWidth-70, 10, 60,60);
