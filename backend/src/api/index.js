@@ -36,7 +36,7 @@ router.get('/drawings', (req, res) => {
 
   dbConnect
     .collection(DB_NAME)
-    .find({}).toArray(function (err, result) {
+    .find({}, function (err, result) {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
