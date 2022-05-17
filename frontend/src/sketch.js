@@ -48,8 +48,52 @@ var isDrawingJustStarted = false;
 *   Drawing data points    *
 ****************************/
 
-let currentDrawing = []; // this array stores a collection of strokes 
-let currentStroke  = []; // each stroke is a coection of (x,y,pressure) sampled dover time
+class Sketch {
+  drawingId;
+  timestamp;
+  author;
+  strokes;
+  constructor(author){
+    this.drawingId = generateUUID();
+    this.timestamp = Date.now();
+    this.strokes = [];
+    this.setAuthor(author);
+  }
+  addStroke(stroke){
+    this.strokes.push(stroke);
+  }
+  setAuthor(author){
+    this.author = author.toLowerCase();
+  }
+}
+class Stroke {
+  strokeId;
+  color;
+  points;
+  constructor(color){
+    this.strokeId = generateUUID();   
+    this.color = color;
+    this.points = [];
+  }
+  addPoint(point){
+    this.points.push(point);
+  }
+}
+class Point {
+  timestamp;
+  x;
+  y;
+  pressure;  
+  constructor(x,y,pressure){
+    this.timestamp = Date.now();
+    this.x = x;
+    this.y = y;
+    this.pressure = pressure;
+  }
+}
+
+let sketch;
+let stroke;
 
 /***********************
 *      UI BUTTONS      *
@@ -81,7 +125,7 @@ new p5(function(p) {
     drawCanvas.position(0, 0);
     p.background(255);
 
-    p.frameRate = 30;
+    p.frameRate = 60;
 
   }
 
@@ -140,12 +184,8 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
-      currentStroke.push({
-        timestamp: Date.now(), 
-        x: p.mouseX, 
-        y: p.mouseY, 
-        pressure: pressure
-      });
+      let point = new Point(p.mouseX, p.mouseY, pressure);
+      stroke.addPoint(point);
 
       isDrawingJustStarted = false;
     }
@@ -185,12 +225,14 @@ new p5(function(p) {
 
       p.text("test", 500, 60);
 
-      changeAuthor();
+      // changeAuthor();
+      clearCanvas();
 
     }
 
     changeAuthor = function() {
       author = prompt("What's your e-mail address");
+      sketch.setAuthor(author);
     }
 
     loadBackgroundImage = function(){
@@ -202,13 +244,6 @@ new p5(function(p) {
       // ... 
       console.log("saving current drawing.")
 
-      // add (0,0,0) as separator
-      // let drawing = currentDrawing.reduce((r,a) => r.concat(a,Array([0,0,0,0])));
-      // let drawing = currentDrawing.reduce((r,a) => r.concat(a,"SEPARATOR"));
-
-      console.log(currentDrawing);
-      // console.log(drawing.join());
-
       // # Download image and text;
       // p.saveCanvas(drawCanvas, 'myDrawing', 'jpg');
       // let writer = p.createWriter('myDrawing.txt');
@@ -217,11 +252,7 @@ new p5(function(p) {
 
       fetch('/api/drawing', {
           method: 'POST',
-          body: JSON.stringify({
-            timestamp: Date.now(),
-            author: author,
-            strokes: currentDrawing      
-          }),
+          body: JSON.stringify(sketch),
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
@@ -243,10 +274,9 @@ new p5(function(p) {
 
 
     clearCanvas = function(){
+      sketch = new Sketch(author);
       drawCanvas.clear();
       uiCanvas.clear();
-      currentDrawing = [];
-      currentStroke = [];
     }
 
   	p.draw = function() {
@@ -282,6 +312,23 @@ new p5(function(p) {
 *       UTILITIES      *
 ************************/
 
+
+function generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime();//Timestamp
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16;//random number between 0 and 16
+        if(d > 0){//Use timestamp until depleted
+            r = (d + r)%16 | 0;
+            d = Math.floor(d/16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r)%16 | 0;
+            d2 = Math.floor(d2/16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
 // Initializing Pressure.js
 // https://pressurejs.com/documentation.html
 function initPressure() {
@@ -294,18 +341,10 @@ function initPressure() {
         // this is called on force start
         isDrawing = true;
         isDrawingJustStarted = true;
+        stroke = new Stroke(colorPicker.color().levels);
   		},
       end: function(){
-    		// this is called on force end
-        if(isDrawing){
-          currentDrawing.push({
-            timestamp: Date.now(),
-            stroke: currentStroke,
-            color: colorPicker.color().levels             
-          });
-          currentStroke = [];
-          // console.log(currentDrawing);
-        }
+        if(isDrawing) sketch.addStroke(stroke);
         isDrawing = false
         pressure = 0;
   		},
