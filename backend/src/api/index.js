@@ -45,4 +45,20 @@ router.get('/drawings', (req, res) => {
     });
 });
 
+router.get('/drawings/:drawingId', (req, res) => {
+  const dbConnect = dbo.getDb();
+
+  const drawingDocument = req.body;
+
+  dbConnect
+    .collection(DB_NAME)
+    .findOne({ drawingId: req.params.drawingId }, function (err, result) {
+      if (err) {
+        res.status(400).send('Error inserting drawing!');
+      } else {
+        res.status(200).json(result);
+      }
+    });
+});
+
 module.exports = router;
