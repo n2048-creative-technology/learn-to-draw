@@ -243,17 +243,11 @@ new p5(function(p) {
     }
 
     saveAndCear = function() {
-      // save currentDrawing data
-      // ... 
       console.log("saving current drawing.")
 
-      // # Download image and text;
-      // p.saveCanvas(drawCanvas, 'myDrawing', 'jpg');
-      // let writer = p.createWriter('myDrawing.txt');
-      // writer.write(drawing.flat());
-      // writer.close();
 
       fetch('/api/drawing', {
+      // fetch('http://127.0.0.1:3000/drawing', {
           method: 'POST',
           body: JSON.stringify(sketch),
           headers: {

@@ -21,7 +21,7 @@ router.post('/drawing', (req, res) => {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
-        res.status(204).json({
+        res.status(200).json({
           message: 'Drawing saved!',
           data: drawingDocument
         });
@@ -36,11 +36,11 @@ router.get('/drawings', (req, res) => {
 
   dbConnect
     .collection(DB_NAME)
-    .find({}, function (err, result) {
+    .find({}).toArray(function (err, result) {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
-        res.status(204).json(result);
+        res.status(200).json(result);
       }
     });
 });
