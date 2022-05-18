@@ -266,7 +266,6 @@ new p5(function(p) {
           alert('There was a problem fetching the drawing.');
           console.log(error);
         });
-      }
     }
 
     saveAndCear = function() {
