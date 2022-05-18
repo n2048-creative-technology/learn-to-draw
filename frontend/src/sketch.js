@@ -263,6 +263,7 @@ new p5(function(p) {
             clearCanvas();
             sketch = new Sketch(data.author, data.width, data.height);
             sketch.drawingId = data.drawingId;
+            sketch.strokes.forEach(stroke => drawStroke);
             return;
           }
           throw new Error('Request failed.');
@@ -270,6 +271,10 @@ new p5(function(p) {
           alert('There was a problem fetching the drawing.');
           console.log(error);
         });
+    }
+
+    drawStroke = function(stroke) {
+      console.log(stroke.timestamp, stroke.color);
     }
 
     saveAndCear = function() {
