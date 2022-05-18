@@ -270,10 +270,10 @@ new p5(function(p) {
               s.points.forEach(point => {
                 s.addPoint(new Point(point.x, point.y, point.presure));
               });
-              sketch.addStroke(stroke);
+              sketch.addStroke(s);
+              drawStroke(s);
             })
             console.log(sketch);
-            sketch.strokes.forEach(stroke => drawStroke);
             return;
           }
           throw new Error('Request failed.');
