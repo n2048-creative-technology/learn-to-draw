@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
   });
 });
   
-router.post('/drawing', (req, res) => {
+router.post('/drawings', (req, res) => {
   const dbConnect = dbo.getDb();
   
   const drawingDocument = req.body;

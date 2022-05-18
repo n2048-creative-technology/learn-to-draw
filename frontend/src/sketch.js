@@ -235,6 +235,8 @@ new p5(function(p) {
       // changeAuthor();
       clearCanvas();
 
+      const id = location.search.split('=')[1];
+      if(id) loadFromId(id);
     }
 
     changeAuthor = function() {
@@ -246,11 +248,32 @@ new p5(function(p) {
 
     }
 
+    loadFromId = function(id){
+      fetch(`/api/drawings/${id}`, {
+      // fetch('http://127.0.0.1:3000/drawing', {
+          method: 'GET',
+          body: JSON.stringify(sketch),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          if(response.ok) {
+            console.log(response);            
+          }
+          throw new Error('Request failed.');
+        }).catch(function(error) {
+          alert('There was a problem fetching the drawing.');
+          console.log(error);
+        });
+      }
+    }
+
     saveAndCear = function() {
       console.log("saving current drawing.")
 
 
-      fetch('/api/drawing', {
+      fetch('/api/drawings', {
       // fetch('http://127.0.0.1:3000/drawing', {
           method: 'POST',
           body: JSON.stringify(sketch),
