@@ -257,7 +257,8 @@ new p5(function(p) {
           }
         }).then(function(response) {
           if(response.ok) {
-            console.log(response.body);
+            const data = response.json();
+            console.log(data);
             return;
           }
           throw new Error('Request failed.');
