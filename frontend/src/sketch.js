@@ -255,9 +255,9 @@ new p5(function(p) {
             Accept: 'application/json',
             'Content-Type': 'application/json'
           }
-        }).then(function(response) {
+        }).then(async function(response) {
           if(response.ok) {
-            const data = response.json();
+            const data = await response.json();
             console.log(data);
             return;
           }
