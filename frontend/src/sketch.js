@@ -268,7 +268,7 @@ new p5(function(p) {
               console.log(stroke);
               const s = new Stroke(stroke.color);
               s.strokeId = stroke.strokeId;
-              s.points.forEach(point => {
+              stroke.points.forEach(point => {
                 const p =  new Point(point.x, point.y, point.presure);
                 p.timestamp = point.timestamp;
                 s.addPoint(p);
