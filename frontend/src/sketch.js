@@ -263,12 +263,15 @@ new p5(function(p) {
             clearCanvas();
             sketch = new Sketch(data.author, data.width, data.height);
             sketch.drawingId = data.drawingId;
-
+            sketch.timestamp = data.timestamp;
             data.strokes.forEach(stroke => {
               console.log(stroke);
               const s = new Stroke(stroke.color);
+              s.strokeId = stroke.strokeId;
               s.points.forEach(point => {
-                s.addPoint(new Point(point.x, point.y, point.presure));
+                const p =  new Point(point.x, point.y, point.presure);
+                p.timestamp = point.timestamp;
+                s.addPoint(p);
               });
               sketch.addStroke(s);
               drawStroke(s);
@@ -284,7 +287,7 @@ new p5(function(p) {
     }
 
     drawStroke = function(stroke) {
-      console.log(stroke.timestamp, stroke.color);
+      console.log(stroke.strokeId , stroke.color);
     }
 
     saveAndCear = function() {
