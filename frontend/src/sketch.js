@@ -250,9 +250,7 @@ new p5(function(p) {
 
     loadFromId = function(id){
       fetch(`/api/drawings/${id}`, {
-      // fetch('http://127.0.0.1:3000/drawing', {
           method: 'GET',
-          body: JSON.stringify(sketch),
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json'
