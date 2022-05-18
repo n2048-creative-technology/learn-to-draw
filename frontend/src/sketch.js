@@ -53,11 +53,15 @@ class Sketch {
   timestamp;
   author;
   strokes;
-  constructor(author){
+  width;
+  height;
+  constructor(author, width, height){
     this.drawingId = generateUUID();
     this.timestamp = Date.now();
     this.strokes = [];
     this.setAuthor(author);
+    this.width = width;
+    this.height = height;
   }
   addStroke(stroke){
     this.strokes.push(stroke);
@@ -266,12 +270,10 @@ new p5(function(p) {
           alert('There was a problem saving the drawing. Try again!');
           console.log(error);
         });
-
       }
 
-
     clearCanvas = function(){
-      sketch = new Sketch(author);
+      sketch = new Sketch(author, p.windowWidth, p.windowHeight);
       drawCanvas.clear();
       uiCanvas.clear();
     }

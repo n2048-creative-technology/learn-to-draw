@@ -40,7 +40,9 @@ router.get('/drawings', (req, res) => {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
-        res.status(200).json(result);
+        res.status(200).json(result.map(d=>{
+          delete d._id; return d;
+        }));
       }
     });
 });
@@ -56,7 +58,13 @@ router.get('/drawings/:drawingId', (req, res) => {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
-        res.status(200).json(result);
+        delete result._id;
+        if(req.query.raw){
+          res.status(200).json(r.flat());
+        }
+        else {
+          res.status(200).json(result);
+        }
       }
     });
 });
