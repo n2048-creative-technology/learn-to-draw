@@ -263,6 +263,14 @@ new p5(function(p) {
             clearCanvas();
             sketch = new Sketch(data.author, data.width, data.height);
             sketch.drawingId = data.drawingId;
+
+            data.strokes.forEach(stroke => {
+              const s = new Stroke(stroke.color);
+              s.points.forEach(point => {
+                s.addPoint(new Point(point.x, point.y, point.presure));
+              });
+              sketch.addStroke(stroke);
+            })
             sketch.strokes.forEach(stroke => drawStroke);
             return;
           }
