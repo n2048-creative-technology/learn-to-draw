@@ -257,7 +257,8 @@ new p5(function(p) {
           }
         }).then(function(response) {
           if(response.ok) {
-            console.log(response);            
+            console.log(response.body);
+            return;
           }
           throw new Error('Request failed.');
         }).catch(function(error) {
