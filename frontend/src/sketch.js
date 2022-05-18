@@ -265,12 +265,14 @@ new p5(function(p) {
             sketch.drawingId = data.drawingId;
 
             data.strokes.forEach(stroke => {
+              console.log(stroke);
               const s = new Stroke(stroke.color);
               s.points.forEach(point => {
                 s.addPoint(new Point(point.x, point.y, point.presure));
               });
               sketch.addStroke(stroke);
             })
+            console.log(sketch);
             sketch.strokes.forEach(stroke => drawStroke);
             return;
           }
