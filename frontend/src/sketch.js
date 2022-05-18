@@ -288,7 +288,7 @@ new p5(function(p) {
     drawStroke = function(stroke) {
       stroke.points.forEach(point => {
         // ... 
-      }
+      });
     }
 
     saveAndCear = function() {
