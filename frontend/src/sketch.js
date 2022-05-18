@@ -234,6 +234,7 @@ new p5(function(p) {
 
       // changeAuthor();
       clearCanvas();
+      sketch = new Sketch(author, p.windowWidth, p.windowHeight);
 
       const id = location.search.split('=')[1];
       if(id) loadFromId(id);
@@ -259,6 +260,9 @@ new p5(function(p) {
           if(response.ok) {
             const data = await response.json();
             console.log(data);
+            clearCanvas();
+            sketch = new Sketch(data.author, data.width, data.height);
+            sketch.drawingId = data.drawingId;
             return;
           }
           throw new Error('Request failed.');
@@ -285,6 +289,7 @@ new p5(function(p) {
             console.log('Drawing was added to the DB.');
             alert('Drawing saved!');
             clearCanvas();
+            sketch = new Sketch(author, p.windowWidth, p.windowHeight);
             return;
           }
           throw new Error('Request failed.');
@@ -295,7 +300,6 @@ new p5(function(p) {
       }
 
     clearCanvas = function(){
-      sketch = new Sketch(author, p.windowWidth, p.windowHeight);
       drawCanvas.clear();
       uiCanvas.clear();
     }
