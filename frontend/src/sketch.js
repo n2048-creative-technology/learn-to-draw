@@ -27,8 +27,8 @@ var showDebug = false;
 var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
-const API_URL = 'http://localhost:3000';
-// const API_URL = 'https://draw.neurohub.io/api';
+// const API_URL = 'http://localhost:3000';
+const API_URL = 'https://draw.neurohub.io/api';
 
 /***********************
 *       GLOBALS        *
