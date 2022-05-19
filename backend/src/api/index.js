@@ -10,14 +10,17 @@ router.get('/', (req, res) => {
   });
 });
   
-router.post('/drawings', (req, res) => {
+router.put('/drawings/:drawingId', (req, res) => {
   const dbConnect = dbo.getDb();
   
   const drawingDocument = req.body;
 
   dbConnect
     .collection(DB_NAME)
-    .insertOne(drawingDocument, function (err, result) {
+    .findOneAndUpdate({
+        drawingId: req.params.drawingId
+      }, 
+      { $set: drawingDocument}, { new:true, upsert: true }, function (err, result) {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {

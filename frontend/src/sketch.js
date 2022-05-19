@@ -27,6 +27,8 @@ var showDebug = false;
 var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
+const API_URL = 'http://localhost:3000';
+// const API_URL = 'https://draw.neurohub.io/api';
 
 /***********************
 *       GLOBALS        *
@@ -107,7 +109,7 @@ let stroke;
 ************************/
 let clearButton;
 let loadImageButton;
-let saveAndClearButton;
+let saveButton;
 let colorPicker;
 let author = '';
 
@@ -136,28 +138,20 @@ new p5(function(p) {
 
   }
 
-  p.draw = function() {
-
+  drawPoint = function(penX, penY,pressure, loading=false){
     // Start Pressure.js if it hasn't started already
     if(isPressureInit == false){
       initPressure();
     }
 
-
     if(isDrawing) {
-      // Smooth out the position of the pointer
-      penX = xFilter.filter(p.mouseX, p.millis());
-      penY = yFilter.filter(p.mouseY, p.millis());
-
-      // What to do on the first frame of the stroke
+ 
+       // What to do on the first frame of the stroke
       if(isDrawingJustStarted) {
         //console.log("started drawing");
         prevPenX = penX;
         prevPenY = penY;
       }
-
-      // Smooth out the pressure
-      pressure = pFilter.filter(pressure, p.millis());
 
       // Define the current brush size based on the pressure
       brushSize = minBrushSize + (pressure * pressureMultiplier);
@@ -191,12 +185,24 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
-      let point = new Point(p.mouseX, p.mouseY, pressure);
-      stroke.addPoint(point);
-
+      if(!loading){
+        let point = new Point(p.mouseX, p.mouseY, pressure);
+        stroke.addPoint(point);  
+      }
       isDrawingJustStarted = false;
     }
+  }
 
+  p.draw = function() {
+    // Smooth out the position of the pointer
+    penX = xFilter.filter(p.mouseX, p.millis());
+    penY = yFilter.filter(p.mouseY, p.millis());
+
+    // Smooth out the pressure
+    pressure = pFilter.filter(pressure, p.millis());
+
+    drawPoint(penX, penY, pressure);
+    // drawPoint(p.mouseX, p.mouseY, pressure);
   }
 }, "p5_instance_01");
 
@@ -213,11 +219,11 @@ new p5(function(p) {
 
       clearButton = p.createButton('Clear');
       clearButton.position(10, 10);
-      clearButton.mousePressed(clearCanvas);
+      clearButton.mousePressed(loadNew);
 
-      saveAndClearButton = p.createButton('Save and Clear');
-      saveAndClearButton.position(70, 10);
-      saveAndClearButton.mousePressed(saveAndCear);
+      saveButton = p.createButton('Save');
+      saveButton.position(70, 10);
+      saveButton.mousePressed(save);
 
       // loadImageButton = p.createButton('Load Image');
       // loadImageButton.position(190, 10);
@@ -232,8 +238,8 @@ new p5(function(p) {
 
       p.text("test", 500, 60);
 
-      // changeAuthor();
       clearCanvas();
+
       sketch = new Sketch(author, p.windowWidth, p.windowHeight);
 
       const id = location.search.split('=')[1];
@@ -250,7 +256,7 @@ new p5(function(p) {
     }
 
     loadFromId = function(id){
-      fetch(`/api/drawings/${id}`, {
+      fetch(`${API_URL}/drawings/${id}`, {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -259,21 +265,23 @@ new p5(function(p) {
         }).then(async function(response) {
           if(response.ok) {
             const data = await response.json();
+            
             clearCanvas();
+            
             sketch = new Sketch(data.author, data.width, data.height);
-            // sketch.drawingId = data.drawingId;
+            sketch.drawingId = data.drawingId;
             sketch.timestamp = data.timestamp;
-            data.strokes.forEach(stroke => {
-              console.log(stroke);
-              const s = new Stroke(stroke.color);
-              // s.strokeId = stroke.strokeId;
-              stroke.points.forEach(point => {
+            data.strokes.forEach(s => {
+              // console.log(stroke);
+              const stroke = new Stroke(s.color);
+              stroke.strokeId = s.strokeId;
+              s.points.forEach(point => {
                 const p =  new Point(point.x, point.y, point.pressure);
                 p.timestamp = point.timestamp;
-                s.addPoint(p);
+                stroke.addPoint(p);
               });
-              sketch.addStroke(s);
-              drawStroke(s);
+              sketch.addStroke(stroke);
+              drawStroke(stroke);
             })
             console.log(sketch);
             return;
@@ -286,18 +294,20 @@ new p5(function(p) {
     }
 
     drawStroke = function(stroke) {
+      isDrawing = true;
+      isDrawingJustStarted = true;
       stroke.points.forEach(point => {
-        // ... 
+        drawPoint(point.x, point.y, point.pressure, true);
+        isDrawingJustStarted = false;        
       });
+      isDrawing = false;
     }
 
-    saveAndCear = function() {
+    save = function() {
       console.log("saving current drawing.")
 
-
-      fetch('/api/drawings', {
-      // fetch('http://127.0.0.1:3000/drawing', {
-          method: 'POST',
+      fetch(`${API_URL}/drawings/${sketch.drawingId}`, {
+          method: 'PUT',
           body: JSON.stringify(sketch),
           headers: {
             Accept: 'application/json',
@@ -306,9 +316,7 @@ new p5(function(p) {
         }).then(function(response) {
           if(response.ok) {
             console.log('Drawing was added to the DB.');
-            alert('Drawing saved!');
-            clearCanvas();
-            sketch = new Sketch(author, p.windowWidth, p.windowHeight);
+            alert('Drawing saved!');            
             return;
           }
           throw new Error('Request failed.');
@@ -318,6 +326,9 @@ new p5(function(p) {
         });
       }
 
+    loadNew = function(){
+      location.search='';      
+    }
     clearCanvas = function(){
       drawCanvas.clear();
       uiCanvas.clear();
@@ -329,17 +340,10 @@ new p5(function(p) {
       p.text(sketch.getAuthor(), 420, 25);
 
       p.fill(colorPicker.color());
-      // p.rect(p.windowWidth-70, 10, 60,60);
 
       if(showDebug){
         p.text("pressure = " + pressure, 10, 60);
 
-        // p.stroke(200,50);
-        // p.line(p.mouseX,0,p.mouseX,p.height);
-        // p.line(0,p.mouseY,p.width,p.mouseY);
-
-        // p.noStroke();
-        // p.fill(100)
         var w = p.width * pressure;
 
         p.fill(0)
