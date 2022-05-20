@@ -28,8 +28,8 @@ var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but inc
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 // const API_URL = 'http://localhost:3000';
-// const API_URL = 'https://draw.neurohub.io/api';
-const API_URL = '/api';
+const API_URL = 'https://draw.neurohub.io/api';
+// const API_URL = '/api';
 
 /***********************
 *       GLOBALS        *
@@ -271,6 +271,7 @@ new p5(function(p) {
           if(response.ok) {
             const data = await response.json();
             drawData(data);
+            setInterval(loadRandom, 3000);
             return;
           }
           throw new Error('Request failed.');
@@ -328,6 +329,8 @@ new p5(function(p) {
         isDrawingJustStarted = false;        
       });
       isDrawing = false;
+      // p.resizeCanvas(p.windowWidth, p.windowHeight);
+      p.updatePixels();
     }
 
     save = function() {
