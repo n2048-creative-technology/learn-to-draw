@@ -248,6 +248,7 @@ new p5(function(p) {
 
       if(location.search.indexOf('random')!=-1){
         loadRandom();
+        setInterval(loadRandom, 5000);
       }
     }
 
@@ -261,7 +262,6 @@ new p5(function(p) {
     }
 
     loadRandom = function () {
-      let intervalMS = 3000;
       fetch(`${API_URL}/random/`, {
           method: 'GET',
           headers: {
@@ -272,15 +272,12 @@ new p5(function(p) {
           if(response.ok) {
             const data = await response.json();
             drawData(data);
-            setInterval(loadRandom, intervalMS);
             return;
           }          
-          setInterval(loadRandom, intervalMS);
-          // throw new Error('Request failed.');
+          // throw new Error('Requesst failed.');
         }).catch(function(error) {
           alert('There was a problem fetching the drawing.');
           console.log(error);
-          setInterval(loadRandom, intervalMS);
         });
     }
     
