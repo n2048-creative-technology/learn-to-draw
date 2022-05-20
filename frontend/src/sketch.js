@@ -243,7 +243,7 @@ new p5(function(p) {
 
       sketch = new Sketch(author, p.windowWidth, p.windowHeight);
 
-      const id = location.search.split('=')[1];
+      const id = location.search.split('id=')[1];
       if(id) loadFromId(id);
 
       if(location.search.indexOf('random')!=-1){
