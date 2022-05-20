@@ -246,7 +246,7 @@ new p5(function(p) {
       const id = location.search.split('=')[1];
       if(id) loadFromId(id);
 
-      if(location.search.contains('random')){
+      if(location.search.contains('random')!=-1){
         loadRandom();
       }
     }
