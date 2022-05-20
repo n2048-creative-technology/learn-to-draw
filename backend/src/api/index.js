@@ -50,6 +50,26 @@ router.get('/drawings', (req, res) => {
     });
 });
 
+router.get('/random', (req, res) => {
+  const dbConnect = dbo.getDb();
+  
+  const drawingDocument = req.body;
+
+  dbConnect
+    .collection(DB_NAME)
+    .find({}).toArray(function (err, result) {
+      if (err) {
+        res.status(400).send('Error inserting drawing!');
+      } else {
+        const count = result.length;
+        const r = Math.floor(Math.random()*count);
+        const drawing = result[r];
+        delete drawing._id;
+        res.status(200).json(drawing);
+      }
+    });
+});
+
 router.get('/drawings/:drawingId', (req, res) => {
   const dbConnect = dbo.getDb();
 
