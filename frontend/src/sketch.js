@@ -245,6 +245,10 @@ new p5(function(p) {
 
       const id = location.search.split('=')[1];
       if(id) loadFromId(id);
+
+      if(location.search.contains('random')){
+        loadRandom();
+      }
     }
 
     changeAuthor = function() {
@@ -256,6 +260,26 @@ new p5(function(p) {
 
     }
 
+    loadRandom = function () {
+      fetch(`${API_URL}/random/`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(async function(response) {
+          if(response.ok) {
+            const data = await response.json();
+            drawData(data);
+            return;
+          }
+          throw new Error('Request failed.');
+        }).catch(function(error) {
+          alert('There was a problem fetching the drawing.');
+          console.log(error);
+        });
+    }
+    
     loadFromId = function(id){
       fetch(`${API_URL}/drawings/${id}`, {
           method: 'GET',
@@ -266,25 +290,7 @@ new p5(function(p) {
         }).then(async function(response) {
           if(response.ok) {
             const data = await response.json();
-            
-            clearCanvas();
-            
-            sketch = new Sketch(data.author, data.width, data.height);
-            sketch.drawingId = data.drawingId;
-            sketch.timestamp = data.timestamp;
-            data.strokes.forEach(s => {
-              // console.log(stroke);
-              const stroke = new Stroke(s.color);
-              stroke.strokeId = s.strokeId;
-              s.points.forEach(point => {
-                const p =  new Point(point.x, point.y, point.pressure);
-                p.timestamp = point.timestamp;
-                stroke.addPoint(p);
-              });
-              sketch.addStroke(stroke);
-              drawStroke(stroke);
-            })
-            console.log(sketch);
+            drawData(data);
             return;
           }
           throw new Error('Request failed.');
@@ -292,6 +298,26 @@ new p5(function(p) {
           alert('There was a problem fetching the drawing.');
           console.log(error);
         });
+    }
+
+    drawData = function(data) {
+      clearCanvas();
+      sketch = new Sketch(data.author, data.width, data.height);
+      sketch.drawingId = data.drawingId;
+      sketch.timestamp = data.timestamp;
+      data.strokes.forEach(s => {
+        // console.log(stroke);
+        const stroke = new Stroke(s.color);
+        stroke.strokeId = s.strokeId;
+        s.points.forEach(point => {
+          const p =  new Point(point.x, point.y, point.pressure);
+          p.timestamp = point.timestamp;
+          stroke.addPoint(p);
+        });
+          sketch.addStroke(stroke);
+        drawStroke(stroke);
+      })
+      console.log(sketch);
     }
 
     drawStroke = function(stroke) {
