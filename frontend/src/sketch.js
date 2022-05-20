@@ -261,6 +261,7 @@ new p5(function(p) {
     }
 
     loadRandom = function () {
+      let intervalMS = 3000;
       fetch(`${API_URL}/random/`, {
           method: 'GET',
           headers: {
@@ -271,13 +272,15 @@ new p5(function(p) {
           if(response.ok) {
             const data = await response.json();
             drawData(data);
-            setInterval(loadRandom, 3000);
+            setInterval(loadRandom, intervalMS);
             return;
-          }
-          throw new Error('Request failed.');
+          }          
+          setInterval(loadRandom, intervalMS);
+          // throw new Error('Request failed.');
         }).catch(function(error) {
           alert('There was a problem fetching the drawing.');
           console.log(error);
+          setInterval(loadRandom, intervalMS);
         });
     }
     
