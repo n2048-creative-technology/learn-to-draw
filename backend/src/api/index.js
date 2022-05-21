@@ -94,7 +94,7 @@ router.get('/drawings/:drawingId', (req, res) => {
            'pen_down', 'pen_up'];
           const opts = { fields };
 
-          strokes = result.strokes.map(
+          strokes = result.strokes.filter(stroke=>stroke.points.length > 0).map(
               stroke => {
                 x = stroke.points[0].x;
                 y = stroke.points[0].y;
