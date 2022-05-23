@@ -36,8 +36,6 @@ router.put('/drawings/:drawingId', (req, res) => {
 router.get('/drawings', (req, res) => {
   const dbConnect = dbo.getDb();
   
-  const drawingDocument = req.body;
-
   dbConnect
     .collection(DB_NAME)
     .find({}).toArray(function (err, result) {
@@ -47,6 +45,20 @@ router.get('/drawings', (req, res) => {
         res.status(200).json(result.map(d=>{
           delete d._id; return d;
         }));
+      }
+    });
+});
+
+router.get('/list', (req, res) => {
+  const dbConnect = dbo.getDb();
+
+  dbConnect
+    .collection(DB_NAME)
+    .find({}).toArray(function (err, result) {
+      if (err) {
+        res.status(400).send('Error inserting drawing!');
+      } else {
+        res.status(200).json(result.map(d=>d.drawingId));
       }
     });
 });
@@ -69,6 +81,7 @@ router.get('/random', (req, res) => {
         if(req.query.csv){
 
             const fields = [
+            'drawingId',
             'ts', 'x', 'y', 
             'dt', 'dx', 'dy', 
             'pressure',
@@ -78,6 +91,7 @@ router.get('/random', (req, res) => {
 
             strokes = drawing.strokes.filter(stroke=>stroke.points.length > 0).map(
                 stroke => {
+                  drawingId: drawing.drawingId;
                   x = stroke.points[0].x;
                   y = stroke.points[0].y;
                   t = stroke.points[0].timestamp;
@@ -133,6 +147,7 @@ router.get('/drawings/:drawingId', (req, res) => {
         if(req.query.csv){
 
           const fields = [
+          'drawingId',
           'ts', 'x', 'y', 
           'dt', 'dx', 'dy', 
           'pressure',
@@ -142,6 +157,7 @@ router.get('/drawings/:drawingId', (req, res) => {
 
           strokes = result.strokes.filter(stroke=>stroke.points.length > 0).map(
               stroke => {
+                drawingId: result.drawingId;
                 x = stroke.points[0].x;
                 y = stroke.points[0].y;
                 t = stroke.points[0].timestamp;
