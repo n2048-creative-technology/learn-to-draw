@@ -98,7 +98,7 @@ router.get('/random', (req, res) => {
                   return stroke.points.map( 
                     (point, n) => {
                       return {
-                        drawingId: drawing.drawingId;
+                        drawingId: drawing.drawingId,
                         ts: point.timestamp,    // timestamp of point
                         x: point.x,            // absolute coordinates on canvas
                         y: point.y,            // absolute coordinates on canvas
@@ -164,7 +164,7 @@ router.get('/drawings/:drawingId', (req, res) => {
                 return stroke.points.map( 
                   (point, n) => {
                     return {
-                      drawingId: result.drawingId;
+                      drawingId: result.drawingId,
                       ts: point.timestamp,    // timestamp of point
                       x: point.x,            // absolute coordinates on canvas
                       y: point.y,            // absolute coordinates on canvas
