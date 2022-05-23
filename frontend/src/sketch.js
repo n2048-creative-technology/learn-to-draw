@@ -31,6 +31,9 @@ var beta      = 1.0;  // increase this to get rid of high speed lag
 const API_URL = 'https://draw.neurohub.io/api';
 // const API_URL = '/api';
 
+// Image
+let randomImageURL;
+
 /***********************
 *       GLOBALS        *
 ************************/
@@ -45,7 +48,6 @@ var drawCanvas, uiCanvas;
 var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
-
 
 /***************************
 *   Drawing data points    *
@@ -113,6 +115,27 @@ let loadImageButton;
 let saveButton;
 let colorPicker;
 let author = '';
+
+
+
+/***********************
+*    DRAWING CANVAS    *
+************************/
+new p5(function(p) {
+
+  p.setup = function() {
+
+    backgroundImage = p.createCanvas(p.windowWidth, p.windowHeight);
+
+    if(location.search.indexOf('blank')===-1 && location.search.indexOf('id')===-1 && location.search.indexOf('random')===-1 ){
+      p.loadImage(randomImageURL, img => {
+        p.tint(255,255,255,150);
+        p.image(img, 0, 0);
+      });
+    }
+  }
+});
+
 
 /***********************
 *    DRAWING CANVAS    *
@@ -195,6 +218,7 @@ new p5(function(p) {
   }
 
   p.draw = function() {
+
     // Smooth out the position of the pointer
     penX = xFilter.filter(p.mouseX, p.millis());
     penY = yFilter.filter(p.mouseY, p.millis());
@@ -336,6 +360,10 @@ new p5(function(p) {
     save = function() {
       console.log("saving current drawing.")
 
+      if(randomImageURL && randomImageURL !== '') {
+        sketch.imageUrl = randomImageURL;
+      }
+      
       fetch(`${API_URL}/drawings/${sketch.drawingId}`, {
           method: 'PUT',
           body: JSON.stringify(sketch),
@@ -461,3 +489,17 @@ function disableScroll(){
 function enableScroll(){
     document.body.removeEventListener('touchmove', preventDefault, { passive: false });
 }*/
+
+
+function jsonFlickrApi( response )
+{
+  if ( response.stat != 'ok' ) { return; }
+
+  var randomImageNum = Math.round( Math.random() * 99 );
+  randomImage = response.photos.photo[ randomImageNum ];
+  randomImageURL = 'https://farm' + randomImage.farm +
+  '.staticflickr.com/' + randomImage.server + '/' +
+  randomImage.id + '_' + randomImage.secret + '_' + 'b.jpg';
+}
+
+
