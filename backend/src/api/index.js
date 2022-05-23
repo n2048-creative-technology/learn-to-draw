@@ -91,7 +91,6 @@ router.get('/random', (req, res) => {
 
             strokes = drawing.strokes.filter(stroke=>stroke.points.length > 0).map(
                 stroke => {
-                  drawingId: drawing.drawingId;
                   x = stroke.points[0].x;
                   y = stroke.points[0].y;
                   t = stroke.points[0].timestamp;
@@ -99,6 +98,7 @@ router.get('/random', (req, res) => {
                   return stroke.points.map( 
                     (point, n) => {
                       return {
+                        drawingId: drawing.drawingId;
                         ts: point.timestamp,    // timestamp of point
                         x: point.x,            // absolute coordinates on canvas
                         y: point.y,            // absolute coordinates on canvas
@@ -157,7 +157,6 @@ router.get('/drawings/:drawingId', (req, res) => {
 
           strokes = result.strokes.filter(stroke=>stroke.points.length > 0).map(
               stroke => {
-                drawingId: result.drawingId;
                 x = stroke.points[0].x;
                 y = stroke.points[0].y;
                 t = stroke.points[0].timestamp;
@@ -165,6 +164,7 @@ router.get('/drawings/:drawingId', (req, res) => {
                 return stroke.points.map( 
                   (point, n) => {
                     return {
+                      drawingId: result.drawingId;
                       ts: point.timestamp,    // timestamp of point
                       x: point.x,            // absolute coordinates on canvas
                       y: point.y,            // absolute coordinates on canvas
