@@ -82,6 +82,7 @@ router.get('/random', (req, res) => {
 
             const fields = [
             'drawingId',
+            'strokeId',
             'ts', 'x', 'y', 
             'dt', 'dx', 'dy', 
             'pressure',
@@ -99,6 +100,7 @@ router.get('/random', (req, res) => {
                     (point, n) => {
                       return {
                         drawingId: drawing.drawingId,
+                        strokeId: stroke.strokeId,
                         ts: point.timestamp,    // timestamp of point
                         x: point.x,            // absolute coordinates on canvas
                         y: point.y,            // absolute coordinates on canvas
@@ -148,6 +150,7 @@ router.get('/drawings/:drawingId', (req, res) => {
 
           const fields = [
           'drawingId',
+          'strokeId',
           'ts', 'x', 'y', 
           'dt', 'dx', 'dy', 
           'pressure',
@@ -165,6 +168,7 @@ router.get('/drawings/:drawingId', (req, res) => {
                   (point, n) => {
                     return {
                       drawingId: result.drawingId,
+                      strokeId: stroke.strokeId,
                       ts: point.timestamp,    // timestamp of point
                       x: point.x,            // absolute coordinates on canvas
                       y: point.y,            // absolute coordinates on canvas
