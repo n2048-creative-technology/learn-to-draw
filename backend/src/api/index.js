@@ -58,7 +58,7 @@ router.get('/list', (req, res) => {
       if (err) {
         res.status(400).send('Error inserting drawing!');
       } else {
-        res.status(200).json(result.map(d=>d.drawingId));
+        res.status(200).json(result.map(d=>{drawingId:d.drawingId}));
       }
     });
 });
