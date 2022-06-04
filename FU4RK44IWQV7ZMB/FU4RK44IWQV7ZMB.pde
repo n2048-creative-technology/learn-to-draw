@@ -4,10 +4,10 @@ GRBL cheatsheet:
  */
 
 
-  float maxX = 1700;
-  float maxY = 1400;
-  float maxZ = 10;
-  
+float maxX = 1700;
+float maxY = 1400;
+float maxZ = 10;
+
 // ---------------------------------------------------
 // DEFINITIONS
 // ---------------------------------------------------
@@ -75,7 +75,12 @@ void setup() {
 void draw() {
   background(255);
   fill(255, 0, 0);
-  ellipse(curX, curY, 10, 10);
+  
+  // 0,0 --> with, 0
+  // width/2, height/2 --> -maxX/2, -maxY/2
+  float x = width+curX*width/maxX;
+  float y = -curY*height/maxY;
+  ellipse(x, y, 10, 10);
   text("("+curX+", "+ curY+ ")", 20, 30);  
   plotter_paused = true;           //pause plotting
   keyboard_mode = true;
@@ -275,8 +280,9 @@ void runHomeCycle() {
 
   sendCommand("$H");
 
-  curX=width;
-  curY=0;
+  curX = 0;
+  curY = 0;
+  
   homed=true;
   ok_to_send = true;
 }
@@ -292,9 +298,11 @@ void sendCommand(String command) {
 }
 
 void goToPos(float _x, float _y) {
-  curX = _x;
-  curY = _y;
   float x = (constrain(_x, 0, width)/width-1)*maxX;
   float y = (-constrain(_y, 0, height)/height)*maxY;
+
+  curX = x;
+  curY = y;
+
   sendCommand("x"+x+"y"+y);
 }
