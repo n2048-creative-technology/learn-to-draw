@@ -99,7 +99,6 @@ void draw() {
     goToPos(mouseX, mouseY);
 
     println();
-    ok_to_send = false;    
     port.clear(); //clear transmit buffer
   }
 }
@@ -124,6 +123,8 @@ void serialEvent (Serial port) {
       String[] coords = plotterResponse.split(":")[1].split(",");
       curX = float(coords[0]);
       curY = float(coords[1]);
+      println(curX, curY);
+      ok_to_send = true;
     }
 
     println(plotterResponse);
@@ -304,6 +305,8 @@ void runHomeCycle() {
 }
 
 void sendCommand(String command) {
+
+  ok_to_send = false;    
   for (int i = 0; i < (command.length()); i++) { 
     port.write(command.charAt(i));
     print(command.charAt(i));
@@ -317,10 +320,14 @@ void goToPos(float _x, float _y) {
   float x = (constrain(_x, 0, width)/width-1)*maxX;
   float y = (-constrain(_y, 0, height)/height)*maxY;
 
-  curX = x;
-  curY = y;
-
   sendCommand("x"+x+"y"+y);
+
+  while ((curX - x)*(curX - x)+(curY - y)*(curY - y) > 1) { 
+    getCurPoss();
+    delay(10);
+  }
+  ok_to_send = true;
+  println("just arrived!");
 }
 
 
