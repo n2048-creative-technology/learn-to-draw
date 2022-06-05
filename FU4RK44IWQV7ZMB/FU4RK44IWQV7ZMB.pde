@@ -3,7 +3,6 @@ GRBL cheatsheet:
  https://www.diymachining.com/downloads/GRBL_Settings_Pocket_Guide_Rev_B.pdf
  */
 
-
 float maxX = 1700;
 float maxY = 1400;
 float maxZ = 10;
@@ -18,6 +17,8 @@ Serial port;                        //create object from Serial class
 // ----- flow control codes
 final char XON = 0x11;              //plotter requests more code
 final char XOFF= 0x13;              //stop sending code to plotter
+
+String plotterResponse = "";
 
 float curX = 0;
 float curY = 0;
@@ -75,7 +76,7 @@ void setup() {
 void draw() {
   background(255);
   fill(255, 0, 0);
-  
+
   // 0,0 --> with, 0
   // width/2, height/2 --> -maxX/2, -maxY/2
   float x = width+curX*width/maxX;
@@ -108,12 +109,27 @@ void draw() {
 // ---------------------------------------------------
 void serialEvent (Serial port) {
   char letter = port.readChar();
+  plotterResponse = plotterResponse + letter;
   if (letter == XON) ok_to_send = true;      //plotter ready for next command
-  print(letter);                            //echo character from arduino
+  //print(letter);                            //echo character from arduino
 
-  if (letter == 'k') {
-    ok_to_send = true;
+  if (letter == '\n') {
+
+    if (plotterResponse.indexOf("ok")>-1) {
+      ok_to_send = true;
+    }
+
+    if (plotterResponse.indexOf("MPos:") > 0) {
+      // parse current position:
+      String[] coords = plotterResponse.split(":")[1].split(",");
+      curX = float(coords[0]);
+      curY = float(coords[1]);
+    }
+
+    println(plotterResponse);
+    plotterResponse = "";
   }
+
   if (!initialized && letter == '$') {
     init();
   }
@@ -282,7 +298,7 @@ void runHomeCycle() {
 
   curX = 0;
   curY = 0;
-  
+
   homed=true;
   ok_to_send = true;
 }
@@ -305,4 +321,9 @@ void goToPos(float _x, float _y) {
   curY = y;
 
   sendCommand("x"+x+"y"+y);
+}
+
+
+void getCurPoss() {
+  sendCommand("?");
 }
