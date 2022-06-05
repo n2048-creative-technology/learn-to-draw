@@ -101,6 +101,8 @@ void setup() {
   } else {
     JSONArray strokes = drawing.getJSONArray("strokes");
     drawStrokes(strokes);
+    
+    runHomeCycle();
   }
   exit();
 }
@@ -113,35 +115,37 @@ void drawStrokes(JSONArray strokes) {
 
     JSONArray points = stroke.getJSONArray("points");
 
-    JSONObject point = points.getJSONObject(0);
-    float x = point.getFloat("x");
-    float y = point.getFloat("y");
+    if (points.size()>0) {
+      JSONObject point = points.getJSONObject(0);
+      float x = point.getFloat("x");
+      float y = point.getFloat("y");
 
-    x = x*canvasWidth/drawingWidth + canvasXOffset;
-    y = y*canvasHeight/drawingHeight + canvasYOffset;
-
-
-    // bring the peen to start position.
-    delay(200);
-    penUp();
-    delay(200);    
-    goToPos(x, y);
-    delay(200);
-    penDown();
-    delay(200);
-
-
-    for (int k = 0; k < points.size(); k++) {
-      point = points.getJSONObject(k);
-      x = point.getFloat("x");
-      y = point.getFloat("y");
       x = x*canvasWidth/drawingWidth + canvasXOffset;
       y = y*canvasHeight/drawingHeight + canvasYOffset;
-      goToPos(x, y);
-    }
 
-    delay(200);
-    penUp();
+
+      // bring the peen to start position.
+      delay(200);
+      penUp();
+      delay(200);    
+      goToPos(x, y);
+      delay(200);
+      penDown();
+      delay(200);
+
+
+      for (int k = 0; k < points.size(); k++) {
+        point = points.getJSONObject(k);
+        x = point.getFloat("x");
+        y = point.getFloat("y");
+        x = x*canvasWidth/drawingWidth + canvasXOffset;
+        y = y*canvasHeight/drawingHeight + canvasYOffset;
+        goToPos(x, y);
+      }
+
+      delay(200);
+      penUp();
+    }
   }
 }
 
@@ -251,7 +255,7 @@ void goToPos(float _x, float _y) {
     delay(10);
   }
   ok_to_send = true;
-  println("just arrived!");
+  println("on target!");
 }
 
 void getCurPoss() {
