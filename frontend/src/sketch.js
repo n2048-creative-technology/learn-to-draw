@@ -28,7 +28,7 @@ var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but inc
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 // const API_URL = 'http://localhost:3000';
-const API_URL = 'https://draw.neurohub.io/api';
+const API_URL = 'https://flow.neurohub.io/';
 // const API_URL = '/api';
 
 // Image
@@ -127,7 +127,7 @@ new p5(function(p) {
 
     backgroundImage = p.createCanvas(p.windowWidth, p.windowHeight);
 
-    if(location.search.indexOf('blank')===-1 && location.search.indexOf('id')===-1 && location.search.indexOf('random')===-1 ){
+    if(location.search.indexOf('bg')!=-1 && location.search.indexOf('id')===-1 && location.search.indexOf('random')===-1 ){
       p.loadImage(randomImageURL, img => {
         p.tint(255,255,255,150);
         p.image(img, 0, 0);

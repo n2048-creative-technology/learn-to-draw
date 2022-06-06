@@ -2,29 +2,36 @@ import java.io.InputStreamReader;
 import processing.serial.*;      
 
 // Constants
-String drawingId = "0c23af0d-7dba-4e19-bc26-f095efef2c22";
+String drawingId = "a2e148ba-f2c2-4309-80a2-1ebe285a8d78";
 boolean debug_on = false;            
 boolean holdPenUp = false; // set to true to test drawing without pushing the pen            
 
 boolean previewOnly = false; // outline drawing Canvas
-boolean drawPreview = false; // actually draw canvas borders;
-
-float canvasWidth_cm = 88;
-float canvasHeight_cm = 75;
-float canvasXOffset_cm = 104; //18; // 104
-float canvasYOffset_cm = 46;
-
-float mx = 7.35;
-float nx = 1080;
-
-float my = 12.5;
-float ny = -850;
 
 
-//float canvasWidth = mx*canvasWidth_cm+nx;
-//float canvasHeight = my*canvasHeight_cm+ny;
-//float canvasXOffset = mx*canvasXOffset_cm+nx;
-//float canvasYOffset = my*canvasYOffset_cm+ny;
+// measure from the top-right corner (x-stop) 
+float canvas_top_right_x_cm = 21;
+float canvas_top_right_y_cm = 49;
+float canvas_bottom_left_x_cm = 120;
+float canvas_bottom_left_y_cm = 104;
+
+// curX and curY values (use the mouse on callibration mode) 
+float canvas_top_right_x_pos = -112;
+float canvas_top_right_y_pos = -406;
+float canvas_bottom_left_x_pos = -940;
+float canvas_bottom_left_y_pos = -1117;
+
+float mx = (canvas_bottom_left_x_pos - canvas_bottom_left_x_cm)/(canvas_top_right_x_pos - canvas_top_right_x_cm);
+float nx = canvas_bottom_left_x_pos - mx*canvas_bottom_left_x_cm;
+float my = (canvas_bottom_left_y_pos - canvas_bottom_left_y_cm)/(canvas_top_right_y_pos - canvas_top_right_y_cm);
+float ny = canvas_bottom_left_y_pos - mx*canvas_bottom_left_y_cm;
+
+
+// Plotter:
+
+float maxX = 1700;
+float maxY = 1400;
+float maxZ = 10;
 
 float canvasWidth = 400;
 float canvasHeight = 250;
@@ -36,11 +43,6 @@ JSONObject drawing;
 PGraphics svg;
 int drawingWidth, drawingHeight;
 
-// Plotter:
-
-float maxX = 1700;
-float maxY = 1400;
-float maxZ = 10;
 
 // ---------------------------------------------------
 // DEFINITIONS
@@ -66,9 +68,8 @@ String plotterResponse = "";
 /// 
 
 void setup() {
-  runPython();
 
-  size(850, 700); 
+  //runPython();
 
   // plotter setup
   if (debug_on) {
@@ -101,7 +102,7 @@ void setup() {
   } else {
     JSONArray strokes = drawing.getJSONArray("strokes");
     drawStrokes(strokes);
-    
+
     runHomeCycle();
   }
   exit();
