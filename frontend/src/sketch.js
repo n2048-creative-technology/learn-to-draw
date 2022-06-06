@@ -28,7 +28,7 @@ var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but inc
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 // const API_URL = 'http://localhost:3000';
-const API_URL = 'https://flow.neurohub.io/';
+const API_URL = 'https://flow.neurohub.io';
 // const API_URL = '/api';
 
 // Image
