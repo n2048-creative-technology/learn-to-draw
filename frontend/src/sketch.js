@@ -28,7 +28,8 @@ var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but inc
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 // const API_URL = 'http://localhost:3000';
-const API_URL = 'https://flow.neurohub.io';
+// const API_URL = 'https://flow.neurohub.io';
+const API_URL = 'https://draw.neurohub.io/api';
 // const API_URL = '/api';
 
 // Image
@@ -368,7 +369,7 @@ new p5(function(p) {
           method: 'PUT',
           body: JSON.stringify(sketch),
           headers: {
-            Accept: 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
         }).then(function(response) {
