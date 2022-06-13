@@ -1,0 +1,852 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "88952ea4b391f43f",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "PUT /drawings",
+        "url": "/drawings",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 120,
+        "wires": [
+            [
+                "fbce9f9690380417"
+            ]
+        ]
+    },
+    {
+        "id": "a259c75d26f73ed6",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1150,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "fbce9f9690380417",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [msg.payload];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "0ff631fa0d1a69b1"
+            ]
+        ]
+    },
+    {
+        "id": "0ff631fa0d1a69b1",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "insertOne",
+        "output": "toArray",
+        "name": "",
+        "x": 620,
+        "y": 120,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "2e8549edfcd9c521",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [{},{projection:{ _id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 300,
+        "wires": [
+            [
+                "e0086aa54faf6529"
+            ]
+        ]
+    },
+    {
+        "id": "e0086aa54faf6529",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "find",
+        "output": "toArray",
+        "name": "find.toArray",
+        "x": 630,
+        "y": 300,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "eb11f7fe3327fd63",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [{}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 480,
+        "wires": [
+            [
+                "9dcea532e7354bba"
+            ]
+        ]
+    },
+    {
+        "id": "9dcea532e7354bba",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "countDocuments",
+        "output": "toArray",
+        "name": "countDocuments",
+        "x": 650,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8fee03553525c363",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "updateOne",
+        "output": "toArray",
+        "name": "",
+        "x": 630,
+        "y": 180,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "70e0ec03403a779e",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /drawings",
+        "url": "/drawings",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "2e8549edfcd9c521"
+            ]
+        ]
+    },
+    {
+        "id": "866be5c74865e45d",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{}, {$inc: {age: 1}, $set: {aged: true}}];\n\nlet drawingId = msg.req.params.drawingId;\n\nmsg.payload = [{drawingId: drawingId}, {$set: msg.payload}];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "8fee03553525c363"
+            ]
+        ]
+    },
+    {
+        "id": "da4dcbc9f26cf9c3",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "PUT /drawings/:drawingId",
+        "url": "/drawings/:drawingId",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "866be5c74865e45d"
+            ]
+        ]
+    },
+    {
+        "id": "c3aa5c31c67d8ea9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [{}, {projection:{drawingId: true,  _id: false }}];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 360,
+        "wires": [
+            [
+                "02d084adcacd3aa6"
+            ]
+        ]
+    },
+    {
+        "id": "02d084adcacd3aa6",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "find",
+        "output": "toArray",
+        "name": "find.toArray",
+        "x": 630,
+        "y": 360,
+        "wires": [
+            [
+                "03975fab043ddcfd"
+            ]
+        ]
+    },
+    {
+        "id": "5c20b87cf491923f",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /list",
+        "url": "/list",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 360,
+        "wires": [
+            [
+                "c3aa5c31c67d8ea9"
+            ]
+        ]
+    },
+    {
+        "id": "dfc1f5c26a5a7794",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /count",
+        "url": "/count",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 480,
+        "wires": [
+            [
+                "eb11f7fe3327fd63"
+            ]
+        ]
+    },
+    {
+        "id": "03975fab043ddcfd",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "\nmsg.payload = msg.payload.map(d => d.drawingId);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 360,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "dd7a39c378ad94e0",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [{}, {projection:{drawingId: true,  _id: false }}];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 420,
+        "wires": [
+            [
+                "bbcd7ad95e010317"
+            ]
+        ]
+    },
+    {
+        "id": "bbcd7ad95e010317",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "find",
+        "output": "toArray",
+        "name": "find.toArray",
+        "x": 630,
+        "y": 420,
+        "wires": [
+            [
+                "749601a3807d9f71"
+            ]
+        ]
+    },
+    {
+        "id": "931b47de8bccec2d",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /urls",
+        "url": "/urls",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 420,
+        "wires": [
+            [
+                "dd7a39c378ad94e0"
+            ]
+        ]
+    },
+    {
+        "id": "749601a3807d9f71",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "\nmsg.payload = msg.payload.map(d => \"https://draw.neurohub.io/?id=\"+d.drawingId);\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 420,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "5dafdd9c1ac79171",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "msg.payload = [{},{projection:{ _id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 700,
+        "wires": [
+            [
+                "494c31041afe68ed"
+            ]
+        ]
+    },
+    {
+        "id": "494c31041afe68ed",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "find",
+        "output": "toArray",
+        "name": "find.toArray",
+        "x": 590,
+        "y": 700,
+        "wires": [
+            [
+                "53c79a43330d6558"
+            ]
+        ]
+    },
+    {
+        "id": "ede2831e6008793e",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /strokes",
+        "url": "/drawings",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 700,
+        "wires": [
+            [
+                "5dafdd9c1ac79171"
+            ]
+        ]
+    },
+    {
+        "id": "53c79a43330d6558",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "\n\nmsg.payload = msg.payload.map(d => d.strokes).flat();\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 700,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "84e75e92a674a99a",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{name: 'marina'}, {fields: {name: 1, age: 1}}];\n\nlet drawingId = msg.req.params.drawingId;\nmsg.payload = [{drawingId: drawingId},{ projection:{_id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 240,
+        "wires": [
+            [
+                "7eb104969627fb80"
+            ]
+        ]
+    },
+    {
+        "id": "7eb104969627fb80",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "findOne",
+        "output": "toArray",
+        "name": "",
+        "x": 620,
+        "y": 240,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "ad17e2a67340b0f8",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /drawings/:drawingId",
+        "url": "/drawings/:drawingId",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 240,
+        "wires": [
+            [
+                "84e75e92a674a99a"
+            ]
+        ]
+    },
+    {
+        "id": "bc80b100dd20a2d0",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{name: 'marina'}, {fields: {name: 1, age: 1}}];\n\nlet drawingId = msg.req.params.drawingId;\nmsg.payload = [{drawingId: drawingId},{ projection:{_id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 560,
+        "wires": [
+            [
+                "c299d25dbf1a4ebf"
+            ]
+        ]
+    },
+    {
+        "id": "c299d25dbf1a4ebf",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "findOne",
+        "output": "toArray",
+        "name": "",
+        "x": 620,
+        "y": 560,
+        "wires": [
+            [
+                "6fe05ae9627865e6"
+            ]
+        ]
+    },
+    {
+        "id": "2f24d68b9268ef48",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /drawings/:drawingId/strokes",
+        "url": "/drawings/:drawingId/strokes",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 560,
+        "wires": [
+            [
+                "bc80b100dd20a2d0"
+            ]
+        ]
+    },
+    {
+        "id": "6fe05ae9627865e6",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "\nlet d = msg.payload;\n\nmsg.payload = d.strokes.map(\n    s => {\n        s.points = s.points.map(p => {\n            p.x /= d.width; \n            p.y /= d.height; \n            return p;\n        });\n        s.width = d.width; \n        s.height = d.height; \n        return s;\n    }\n);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 560,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "1131468112a9e335",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{name: 'marina'}, {fields: {name: 1, age: 1}}];\n\nlet drawingId = msg.req.params.drawingId;\nmsg.payload = [{drawingId: drawingId},{ projection:{_id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 620,
+        "wires": [
+            [
+                "33661496ff632132"
+            ]
+        ]
+    },
+    {
+        "id": "33661496ff632132",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "findOne",
+        "output": "toArray",
+        "name": "",
+        "x": 620,
+        "y": 620,
+        "wires": [
+            [
+                "d10b10bcfc10aeaa"
+            ]
+        ]
+    },
+    {
+        "id": "c3722aa9ab3422f9",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "GET /drawings/:drawingId/points",
+        "url": "/drawings/:drawingId/points",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 620,
+        "wires": [
+            [
+                "1131468112a9e335"
+            ]
+        ]
+    },
+    {
+        "id": "d10b10bcfc10aeaa",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "\nlet d = msg.payload;\n\nmsg.payload = d.strokes.filter(s=> s.points.length>0).map(\n    s => s.points.map(\n        p => {\n            p.drawingId = d.drawingId; \n            p.strokeId = s.strokeId; \n            p.red = s.color[0]; \n            p.green = s.color[1]; \n            p.blue = s.color[2]; \n            p.x /= d.width; \n            p.y /= d.height; \n            p.width = d.width; \n            p.height = d.height; \n            return p;\n        }\n    )\n).flat();\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 620,
+        "wires": [
+            [
+                "a259c75d26f73ed6"
+            ]
+        ]
+    },
+    {
+        "id": "7cdccc3fd6bbe761",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "PUT /drawings/:drawingId/simple",
+        "url": "/drawings/:drawingId/simple",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 960,
+        "wires": [
+            [
+                "12ca3e94346ec8f5"
+            ]
+        ]
+    },
+    {
+        "id": "12ca3e94346ec8f5",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{name: 'marina'}, {fields: {name: 1, age: 1}}];\n\nlet drawingId = msg.req.params.drawingId;\nmsg.simpleStrokes=msg.payload;\nmsg.payload = [{drawingId: drawingId},{ projection:{_id: 0}}];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 960,
+        "wires": [
+            [
+                "5045f61e8f2fe544"
+            ]
+        ]
+    },
+    {
+        "id": "5045f61e8f2fe544",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "findOne",
+        "output": "toArray",
+        "name": "",
+        "x": 620,
+        "y": 960,
+        "wires": [
+            [
+                "98fa8a7b57da84b7",
+                "0a0f94c862c868ee"
+            ]
+        ]
+    },
+    {
+        "id": "98fa8a7b57da84b7",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// console.log(msg.payload);\nwidth = msg.payload.width;\nheight = msg.payload.height;\n\ndata = msg.simpleStrokes.map(s => {\n    points = s.xs.map((v,k) => {\n        return {\n            x: s.xs[k] * width,\n            y: s.ys[k] * height,\n            pressure: .1,\n            timestamp: Date.now()\n        };\n    });\n    simpleStrokes = {\n        strokeId: s.strokeId,\n        points,\n        color:[0,0,0,255]\n    }\n    return simpleStrokes;\n});\n\nmsg.payload = data;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 960,
+        "wires": [
+            [
+                "80ac9a443d56456f"
+            ]
+        ]
+    },
+    {
+        "id": "658bbc6104c42496",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "updateOne",
+        "output": "toArray",
+        "name": "",
+        "x": 1150,
+        "y": 960,
+        "wires": [
+            [
+                "f36c5b4e8b7eb220"
+            ]
+        ]
+    },
+    {
+        "id": "80ac9a443d56456f",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{}, {$inc: {age: 1}, $set: {aged: true}}];\n\nlet drawingId = msg.req.params.drawingId;\n\nmsg.payload = [{drawingId: drawingId}, {$set: {simpleStrokes: msg.payload}}];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 960,
+        "wires": [
+            [
+                "658bbc6104c42496"
+            ]
+        ]
+    },
+    {
+        "id": "0a0f94c862c868ee",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// console.log(msg.payload);\nwidth = msg.payload.width;\nheight = msg.payload.height;\n\ndata = msg.simpleStrokes.map(s => {\n    points = s.xs.map((v,k) => {\n        return {\n            x: s.xs[k] * width,\n            y: s.ys[k] * height,\n            pressure: .1,\n            timestamp: Date.now()\n        };\n    });\n    simpleStrokes = {\n        strokeId: s.strokeId,\n        points,\n        color:[0,0,0,255]\n    }\n    return simpleStrokes;\n});\n\nmsg.payload.strokes = data;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 920,
+        "wires": [
+            [
+                "d330c7c794d9c624"
+            ]
+        ]
+    },
+    {
+        "id": "d330c7c794d9c624",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "set payload",
+        "func": "// msg.payload = [{}, {$inc: {age: 1}, $set: {aged: true}}];\n\ndata = msg.payload;\ndata.drawingId = data.drawingId + \"-s\";\nmsg.payload = [{drawingId: data.drawingId}, {$set: data}, {upsert:true}];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 920,
+        "wires": [
+            [
+                "c5d0c675713e2af4"
+            ]
+        ]
+    },
+    {
+        "id": "f36c5b4e8b7eb220",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1370,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "fe78ef4dbb7d8591",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "c5d0c675713e2af4",
+        "type": "mongodb4",
+        "z": "f6f2187d.f17ca8",
+        "clientNode": "88aa4f7eb976aea8",
+        "collection": "drawings",
+        "operation": "updateOne",
+        "output": "toArray",
+        "name": "",
+        "x": 1150,
+        "y": 920,
+        "wires": [
+            [
+                "fe78ef4dbb7d8591"
+            ]
+        ]
+    },
+    {
+        "id": "88aa4f7eb976aea8",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "mongo.neurohub.io",
+        "port": "27017",
+        "dbName": "drawings",
+        "authSource": "admin",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsInsecure": false,
+        "uri": "",
+        "advanced": "",
+        "uriTabActive": "tab-uri-simple"
+    }
+]

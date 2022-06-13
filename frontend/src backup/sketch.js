@@ -27,9 +27,13 @@ var showDebug = false;
 var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
-const API_URL = 'https://flow.neurohub.io';
+// const API_URL = 'http://localhost:3000';
+// const API_URL = 'https://flow.neurohub.io';
+const API_URL = 'https://draw.neurohub.io/api';
+// const API_URL = '/api';
 
-const maxPointsPerStroke = 100;
+// Image
+let randomImageURL;
 
 /***********************
 *       GLOBALS        *
@@ -51,69 +55,30 @@ var isDrawingJustStarted = false;
 ****************************/
 
 class Sketch {
+  drawingId;
   timestamp;
+  author;
   strokes;
   width;
   height;
-  author;
-  constructor(width, height){
+  constructor(author, width, height){
+    this.drawingId = generateUUID();
     this.timestamp = Date.now();
     this.strokes = [];
+    this.setAuthor(author);
     this.width = width;
     this.height = height;
-    this.author = 'JS';
-    this.createNewDrawing();
   }
-
-  createNewDrawing() {
-      let self = this;
-      fetch(`${API_URL}/sketches`, {
-          method: 'POST',
-          body: JSON.stringify(self),
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }).then(async function(response) {
-          if(response.ok) {
-            const data = await response.json();
-            self.id = data.insertedId;
-            window.location.href = window.location.href.split('#')[0] + '#'+self.id;
-            console.log(data);
-            return;
-          }
-          throw new Error('Request failed.');
-        }).catch(function(error) {
-          alert('Error: createNewDrawing',error);
-          console.log(error);
-        });
-    }
-
-    addStroke(stroke) {     
-      if(stroke.points.length<3) return;
-      let self = this; 
-      fetch(`${API_URL}/sketches/${this.id}/strokes`, {
-          method: 'PUT',
-          body: JSON.stringify(stroke),
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }).then(async function(response) {
-          if(response.ok) {
-            console.log('Drawing was added to the DB.');
-            // alert('Drawing saved!')
-            self.strokes.push(stroke);      
-            return;
-          }
-          throw new Error('Request failed.');
-        }).catch(function(error) {
-          alert('There was a problem saving the drawing. Try again!');
-          console.log(error);
-        });
-      }
+  addStroke(stroke){
+    this.strokes.push(stroke);
+  }
+  setAuthor(author){
+    this.author = author.toLowerCase();
+  }
+  getAuthor(){
+    return this.author;
+  }
 }
-
 class Stroke {
   strokeId;
   color;
@@ -147,6 +112,11 @@ let stroke;
 *      UI BUTTONS      *
 ************************/
 let clearButton;
+let loadImageButton;
+let saveButton;
+let colorPicker;
+let author = '';
+
 
 
 /***********************
@@ -158,8 +128,15 @@ new p5(function(p) {
 
     backgroundImage = p.createCanvas(p.windowWidth, p.windowHeight);
 
+    if(location.search.indexOf('bg')!=-1 && location.search.indexOf('id')===-1 && location.search.indexOf('random')===-1 ){
+      p.loadImage(randomImageURL, img => {
+        p.tint(255,255,255,150);
+        p.image(img, 0, 0);
+      });
+    }
   }
 });
+
 
 /***********************
 *    DRAWING CANVAS    *
@@ -186,7 +163,7 @@ new p5(function(p) {
 
   }
 
-  drawPoint = function(penX, penY,pressure){
+  drawPoint = function(penX, penY,pressure, loading=false){
     // Start Pressure.js if it hasn't started already
     if(isPressureInit == false){
       initPressure();
@@ -211,7 +188,6 @@ new p5(function(p) {
       // will be drawn to fill in the empty space
       inBetween = (d / p.min(brushSize,prevBrushSize)) * brushDensity;
 
-      p.fill(0)
       // Add ellipses to fill in the space
       // between samples of the pen position
       for(i=1;i<=inBetween;i++){
@@ -220,12 +196,13 @@ new p5(function(p) {
         x = p.lerp(prevPenX, penX, amt);
         y = p.lerp(prevPenY, penY, amt);
         p.noStroke();
+        p.fill(colorPicker.color());
         p.ellipse(x, y, s);
       }
 
       // Draw an ellipse at the latest position
       p.noStroke();
-      p.fill(0)
+      p.fill(colorPicker.color())
       p.ellipse(penX, penY, brushSize);
 
       // Save the latest brush values for next frame
@@ -233,14 +210,10 @@ new p5(function(p) {
       prevPenX = penX;
       prevPenY = penY;
 
+      if(!loading){
         let point = new Point(p.mouseX, p.mouseY, pressure);
-        if(stroke.points.length > maxPointsPerStroke){
-          stroke.addPoint(point); 
-          sketch.addStroke(stroke);
-          stroke = new Stroke(stroke.color);
-        }
         stroke.addPoint(point);  
-
+      }
       isDrawingJustStarted = false;
     }
   }
@@ -274,7 +247,26 @@ new p5(function(p) {
       clearButton.position(10, 10);
       clearButton.mousePressed(loadNew);
 
-      loadNew();
+      saveButton = p.createButton('Save');
+      saveButton.position(70, 10);
+      saveButton.mousePressed(save);
+
+      // loadImageButton = p.createButton('Load Image');
+      // loadImageButton.position(190, 10);
+      // loadImageButton.mousePressed(loadBackgroundImage);
+
+      changeAuthorButton = p.createButton('Change Author');
+      changeAuthorButton.position(290, 10);
+      changeAuthorButton.mousePressed(changeAuthor);
+
+      colorPicker = p.createColorPicker('#000000');
+      colorPicker.position(p.windowWidth - 200, 5);
+
+      p.text("test", 500, 60);
+
+      clearCanvas();
+
+      sketch = new Sketch(author, p.windowWidth, p.windowHeight);
 
       const id = location.search.split('id=')[1];
       if(id) loadFromId(id);
@@ -285,9 +277,118 @@ new p5(function(p) {
       }
     }
 
-    loadNew = function(){
-      sketch = new Sketch(p.windowWidth, p.windowHeight);  
+    changeAuthor = function() {
+      author = prompt("What's your e-mail address");
+      sketch.setAuthor(author);
+    }
+
+    loadBackgroundImage = function(){
+
+    }
+
+    loadRandom = function () {
+      fetch(`${API_URL}/random/`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(async function(response) {
+          if(response.ok) {
+            const data = await response.json();
+            drawData(data);
+            return;
+          }          
+          // throw new Error('Requesst failed.');
+        }).catch(function(error) {
+          alert('There was a problem fetching the drawing.');
+          console.log(error);
+        });
+    }
+    
+    loadFromId = function(id){
+      fetch(`${API_URL}/drawings/${id}`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(async function(response) {
+          if(response.ok) {
+            const data = await response.json();
+            drawData(data);
+            setTimeout(()=>{loadFromId(id)}, 500);
+            return;
+          }
+          throw new Error('Request failed.');
+        }).catch(function(error) {
+          // alert('There was a problem fetching the drawing.');
+          setTimeout(()=>{loadFromId(id)}, 500);
+          console.log(error);
+        });
+    }
+
+    drawData = function(data) {
       clearCanvas();
+      sketch = new Sketch(data.author, data.width, data.height);
+      sketch.drawingId = data.drawingId;
+      sketch.timestamp = data.timestamp;
+      data.strokes.forEach(s => {
+        // console.log(stroke);
+        const stroke = new Stroke(s.color);
+        stroke.strokeId = s.strokeId;
+        s.points.forEach(point => {
+          const p =  new Point(point.x, point.y, point.pressure);
+          p.timestamp = point.timestamp;
+          stroke.addPoint(p);
+        });
+          sketch.addStroke(stroke);
+        drawStroke(stroke);
+      })
+      console.log(sketch);
+    }
+
+    drawStroke = function(stroke) {
+      isDrawing = true;
+      isDrawingJustStarted = true;
+      stroke.points.forEach(point => {
+        drawPoint(point.x, point.y, point.pressure, true);
+        isDrawingJustStarted = false;        
+      });
+      isDrawing = false;
+      // p.resizeCanvas(p.windowWidth, p.windowHeight);
+      p.updatePixels();
+    }
+
+    save = function() {
+      console.log("saving current drawing.")
+
+      if(randomImageURL && randomImageURL !== '') {
+        sketch.imageUrl = randomImageURL;
+      }
+      
+      fetch(`${API_URL}/drawings/${sketch.drawingId}`, {
+          method: 'PUT',
+          body: JSON.stringify(sketch),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }).then(function(response) {
+          if(response.ok) {
+            console.log('Drawing was added to the DB.');
+            alert('Drawing saved!');            
+            return;
+          }
+          throw new Error('Request failed.');
+        }).catch(function(error) {
+          alert('There was a problem saving the drawing. Try again!');
+          console.log(error);
+        });
+      }
+
+    loadNew = function(){
+      location.search='';      
     }
     clearCanvas = function(){
       drawCanvas.clear();
@@ -297,10 +398,13 @@ new p5(function(p) {
   	p.draw = function() {
 
       uiCanvas.clear();
+      p.text(sketch.getAuthor(), 420, 25);
 
-      p.fill(0);
+      p.fill(colorPicker.color());
 
       if(showDebug){
+        p.text("pressure = " + pressure, 10, 60);
+
         var w = p.width * pressure;
 
         p.fill(0)
@@ -346,7 +450,7 @@ function initPressure() {
         // this is called on force start
         isDrawing = true;
         isDrawingJustStarted = true;
-        stroke = new Stroke(0);
+        stroke = new Stroke(colorPicker.color().levels);
   		},
       end: function(){
         if(isDrawing) sketch.addStroke(stroke);
@@ -366,7 +470,7 @@ function initPressure() {
 
     Pressure.config({
       polyfill: true, // use time-based fallback ?
-      polyfillSpeedUp: 600, // how long does the fallback take to reach full pressure
+      polyfillSpeedUp: 1000, // how long does the fallback take to reach full pressure
       polyfillSpeedDown: 300,
       preventSelect: true,
       only: null
@@ -374,12 +478,31 @@ function initPressure() {
 
 }
 
+// Disabling scrolling and bouncing on iOS Safari
+// https://stackoverflow.com/questions/7768269/ipad-safari-disable-scrolling-and-bounce-effect
+
 function preventDefault(e){
     e.preventDefault();
 }
 
 function disableScroll(){
     document.body.addEventListener('touchmove', preventDefault, { passive: false });
+}
+/*
+function enableScroll(){
+    document.body.removeEventListener('touchmove', preventDefault, { passive: false });
+}*/
+
+
+function jsonFlickrApi( response )
+{
+  if ( response.stat != 'ok' ) { return; }
+
+  var randomImageNum = Math.round( Math.random() * 99 );
+  randomImage = response.photos.photo[ randomImageNum ];
+  randomImageURL = 'https://farm' + randomImage.farm +
+  '.staticflickr.com/' + randomImage.server + '/' +
+  randomImage.id + '_' + randomImage.secret + '_' + 'b.jpg';
 }
 
 
