@@ -4,7 +4,6 @@ import processing.serial.*;
 // Constants
 boolean debug_on = false;            
 boolean holdPenUp = false; // set to true to test drawing without pushing the pen            
-
 boolean previewOnly = false; // outline drawing Canvas
 
 // measure from the top-right corner (x-stop) 
@@ -32,10 +31,15 @@ float maxX = 1700;
 float maxY = 1400;
 float maxZ = 10;
 
-float canvasWidth = 400;
-float canvasHeight = 250;
-float canvasXOffset = 450;
-float canvasYOffset = 200;
+//float canvasWidth = 400;
+//float canvasHeight = 250;
+//float canvasXOffset = 450;
+//float canvasYOffset = 200;
+
+float canvasWidth = 900;
+float canvasHeight = 450;
+float canvasXOffset = 10;
+float canvasYOffset = 10;
 
 // 
 JSONObject drawing;
@@ -94,9 +98,15 @@ void setup() {
   if (previewOnly) {
     while (true) {
       // outline Image Borders:
+
+      JSONArray strokes = loadJSONArray("https://flow.neurohub.io/active");
+      JSONObject stroke = strokes.getJSONObject(0);
+      drawingWidth = stroke.getFloat("width");
+      drawingHeight = stroke.getFloat("height");
       preview();
     }
   } else {
+    runHomeCycle();
     getDataAndDraw();
   }
   exit();
@@ -111,7 +121,6 @@ void getDataAndDraw() {
   updateStrokes(strokes);
   println(activeStrokes.size() + " active stroke(s)");
   drawStrokes();
-  runHomeCycle();
   getDataAndDraw();
 }
 
@@ -145,7 +154,7 @@ void drawStrokes() {
 
     drawingWidth = stroke.getFloat("width");
     drawingHeight = stroke.getFloat("height");
-    
+
     String strokeId = stroke.getString("strokeId");      
 
     JSONArray points = stroke.getJSONArray("points");
@@ -173,8 +182,8 @@ void drawStrokes() {
         y = point.getFloat("y");
         x = x*canvasWidth/drawingWidth + canvasXOffset;
         y = y*canvasHeight/drawingHeight + canvasYOffset;
-        
-        
+
+
         goToPos(x, y);
       }
 
@@ -240,9 +249,8 @@ void init() {
 
   delay(500);
   // set homing speed
-  sendCommand("$24="+homingSpeed); 
+  //sendCommand("$24="+homingSpeed); 
 
-  
   // set max X to 10mm
   sendCommand("$130="+maxX); 
   // set max Z to 10mm
