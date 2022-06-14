@@ -81,7 +81,7 @@ def predict(points, width, height, numPoints = 10):
 
     generated = points.iloc[points.shape[0]-numPoints:].copy();
 
-    for n in range(10):
+    for n in range(100):
         input_seq = pd.DataFrame(generated.iloc[generated.shape[0]-numPoints:].values.reshape(1,generated.shape[1]*numPoints));
         prediction = pd.DataFrame(model.predict(input_seq.values), columns=points.columns)
         generated = generated.append(prediction,ignore_index=True)

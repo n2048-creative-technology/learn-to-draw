@@ -80,7 +80,7 @@ void setup() {
   if (debug_on) {
     printArray(Serial.list());
   }
-  String plotter_port = Serial.list()[2];
+  String plotter_port = Serial.list()[3];
   println(plotter_port);
 
   if (!debug_on) {
@@ -115,10 +115,21 @@ void setup() {
 
 void getDataAndDraw() {
   delay(1000);
-  println("Retrieving strokes... [" + millis() + "]");
-  JSONArray strokes = loadJSONArray("https://flow.neurohub.io/active");
+  JSONArray strokes;
+  
+  println("Retrieving simplified strokes... [" + millis() + "]");
+  strokes = loadJSONArray("https://flow.neurohub.io/simplified");
   println(strokes.size() + " stroke(s) found in sketch");
   updateStrokes(strokes);
+
+  println("Retrieving expanded strokes... [" + millis() + "]");
+  strokes = loadJSONArray("https://flow.neurohub.io/expanded");
+  updateStrokes(strokes);
+
+  println("Retrieving predicted strokes... [" + millis() + "]");
+  strokes = loadJSONArray("https://flow.neurohub.io/predictions");
+  updateStrokes(strokes);
+
   println(activeStrokes.size() + " active stroke(s)");
   drawStrokes();
   getDataAndDraw();
@@ -282,10 +293,10 @@ void sendCommand(String command) {
   ok_to_send = false;    
   for (int i = 0; i < (command.length()); i++) { 
     port.write(command.charAt(i));
-    print(command.charAt(i));
+    //print(command.charAt(i));
   }
   port.write('\n');
-  println();
+  //println();
   port.clear(); //clear transmit buffer
 }
 
