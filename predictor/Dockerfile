@@ -1,15 +1,14 @@
-FROM python:3.6
+FROM tensorflow/tensorflow:latest
 
-RUN apt-get update -y \
-    && apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev libsnmp-dev
-
-COPY requirements.txt requirements.txt
-
-RUN pip install -r requirements.txt
+RUN pip install flask
+RUN pip install flask_restful
+RUN pip install pandas
+RUN pip install numpy
+RUN pip install scipy
 
 WORKDIR /app
 
-COPY model.h5 /app/modelh.h5
+COPY model.h5 /app/model.h5
 
 COPY api.py /app/api.py
 

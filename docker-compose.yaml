@@ -1,0 +1,55 @@
+volumes:
+  mongo_data:
+  flow_data:
+
+services:
+  draw-api.neurohub.io:
+    container_name: draw-api.neurohub.io
+    build: backend
+    restart: always
+    ports: 
+      - 3000:3000
+    environment:
+      - DB_USERNAME=JeWSwxsp5uqerd1p
+      - DB_PASWORD=8erBv51wLlfDFf7g
+      - DB_HOST=mongo.neurohub.io
+      - DB_PORT=27017
+      - DB_NAME=drawings
+      - DB_AUTH=admin 
+
+  draw.neurohub.io:
+    container_name: draw.neurohub.io
+    build: frontend
+    restart: always
+    ports: 
+      - 8080:80
+
+  predictor.neurohub.io:
+    container_name: predictor.neurohub.io
+    build: predictor    
+    ports: 
+      - 5002:5002
+    restart: always
+
+  mongo.neurohub.io:
+    container_name: mongo.neurohub.io
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=JeWSwxsp5uqerd1p
+      - MONGO_INITDB_ROOT_PASSWORD=8erBv51wLlfDFf7g
+
+  flow.neurohub.io:
+    image: nodered/node-red:latest
+    environment:
+      - TZ=Europe/Amsterdam
+    ports:
+      - "1880:1880/tcp"
+      - "1880:1880/udp"
+    volumes:
+      - flow_data:/data
+
+

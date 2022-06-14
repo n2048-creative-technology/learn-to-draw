@@ -1,5 +1,0 @@
-tensorflow
-keras
-json
-flask
-flask_restful
