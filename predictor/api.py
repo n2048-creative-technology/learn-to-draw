@@ -21,7 +21,7 @@ def add_simplify():
     data = []
     for stroke in request.json:
         simple_stroke = stroke;
-        simple_stroke['points'] = simplify(stroke['points'], numPoints)
+        simple_stroke['points'] = interpolate(stroke['points'], numPoints)
         data.append(simple_stroke);
     
     return Response(json.dumps(data, cls=NumpyArrayEncoder), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
@@ -31,9 +31,9 @@ def add_expand():
     numPoints = 60;
     data = []
     for stroke in request.json:
-        simple_stroke = stroke;
-        simple_stroke['points'] = simplify(stroke['points'], numPoints)
-        data.append(simple_stroke);
+        expanded_stroke = stroke;
+        expanded_stroke['points'] = interpolate(stroke['points'], numPoints)
+        data.append(expanded_stroke);
     
     return Response(json.dumps(data, cls=NumpyArrayEncoder), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
 
@@ -49,11 +49,13 @@ def add_predict():
 
     data = []
     for stroke in request.json:
-        stroke.points = simplify(points, numPoints);
+        points = interpolate(stroke['points'], numPoints);
         width = stroke['width'];
         height = stroke['height'];
-        predict(points)
-    
+        predicted_stroke = stroke;
+        predicted_stroke['points'] = predict(points, width, height, numPoints)
+        data.append(predicted_stroke)
+
     return Response(json.dumps(data, cls=NumpyArrayEncoder), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
 
     # return Response(generated.iloc[numPoints:].to_json(orient = 'records'), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
@@ -72,7 +74,7 @@ class NumpyArrayEncoder(JSONEncoder):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
 
-def predict(points, numPoints = 10):
+def predict(points, width, height, numPoints = 10):
     points = pd.DataFrame(points).loc[:,["x","y","pressure"]];
     points['x'] /= width;
     points['y'] /= height;
@@ -88,7 +90,9 @@ def predict(points, numPoints = 10):
     generated['y'] *= height;
     generated['timestamp'] = time.time();
 
-def simplify(points, numPoints = 10):
+    return generated.to_dict(orient='records');
+
+def interpolate(points, numPoints = 10):
     if len(points) < 5: return points; 
     points_df = pd.DataFrame(points);
     s=.1
@@ -107,7 +111,7 @@ def simplify(points, numPoints = 10):
     for n in range(numPoints):
         data.append({'timestamp':splt(ts)[n],
                 'x':splx(xs)[n],
-                's':sply(ys)[n],
+                'y':sply(ys)[n],
                 'pressure':splp(ps)[n]
         })
     return data 
