@@ -10,7 +10,7 @@ from tensorflow import keras
 
 app = Flask(__name__)
 
-model = keras.models.load_model('model.h5')
+model = keras.models.load_model('models/model.h5')
 
 # Expect list of strokes [{strokeId, points:{timestamp, x,y,pressure}...}... ]
 # same format as https://flow.neurohub.io/active
@@ -47,29 +47,16 @@ def add_predict():
     width = 1;
     height = 1;
 
+    data = []
     for stroke in request.json:
         stroke.points = simplify(points, numPoints);
         width = stroke['width'];
         height = stroke['height'];
-        for point in stroke['points']:
-            points.append(point);
+        predict(points)
     
-    points = pd.DataFrame(points).loc[:,["x","y","pressure"]];
-    points['x'] /= width;
-    points['y'] /= height;
+    return Response(json.dumps(data, cls=NumpyArrayEncoder), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
 
-    generated = points.iloc[points.shape[0]-numPoints:].copy();
-
-    for n in range(10):
-        input_seq = pd.DataFrame(generated.iloc[generated.shape[0]-numPoints:].values.reshape(1,generated.shape[1]*numPoints));
-        prediction = pd.DataFrame(model.predict(input_seq.values), columns=points.columns)
-        generated = generated.append(prediction,ignore_index=True)
-        
-    generated['x'] *= width;
-    generated['y'] *= height;
-    generated['timestamp'] = time.time();
-
-    return Response(generated.iloc[numPoints:].to_json(orient = 'records'), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
+    # return Response(generated.iloc[numPoints:].to_json(orient = 'records'), headers={'Access-Control-Allow-Origin':'*', 'Content-Type':'application/json'});
 
     # for n in range(500):
     #   prediction = pd.DataFrame(model.predict(input_seq.values), columns=points.columns)
@@ -84,6 +71,22 @@ class NumpyArrayEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
+
+def predict(points, numPoints = 10):
+    points = pd.DataFrame(points).loc[:,["x","y","pressure"]];
+    points['x'] /= width;
+    points['y'] /= height;
+
+    generated = points.iloc[points.shape[0]-numPoints:].copy();
+
+    for n in range(10):
+        input_seq = pd.DataFrame(generated.iloc[generated.shape[0]-numPoints:].values.reshape(1,generated.shape[1]*numPoints));
+        prediction = pd.DataFrame(model.predict(input_seq.values), columns=points.columns)
+        generated = generated.append(prediction,ignore_index=True)
+        
+    generated['x'] *= width;
+    generated['y'] *= height;
+    generated['timestamp'] = time.time();
 
 def simplify(points, numPoints = 10):
     if len(points) < 5: return points; 

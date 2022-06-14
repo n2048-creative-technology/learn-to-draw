@@ -1,0 +1,63 @@
+ _format_version: "1.1"
+
+ services:
+ - host: draw.neurohub.io
+   name: draw.neurohub.io
+   port: 80
+   protocol: http
+   routes:
+   - name: draw
+     # hosts: ["draw.neurohub.io"]
+     paths: ["/draw"]
+     preserve_host: false
+     protocols:
+     - http
+     - https
+     regex_priority: 0
+     strip_path: true
+
+ - host: draw-api.neurohub.io
+   name: draw-api.neurohub.io
+   port: 3000
+   protocol: http
+   routes:
+   - name: draw-api
+     # hosts: ["draw.neurohub.io"]
+     paths: ["/api/"]
+     preserve_host: false
+     protocols:
+     - http
+     - https
+     regex_priority: 0
+     strip_path: true
+
+ - host: flow.neurohub.io
+   name: flow.neurohub.io
+   port: 1880
+   protocol: http
+   routes:
+   - name: flow
+     # hosts: ["flow.neurohub.io"]
+     paths: ["/"]
+     preserve_host: false
+     protocols:
+     - http
+     - https
+     regex_priority: 0
+     strip_path: true
+
+ - host: predictor.neurohub.io
+   name: predictor.neurohub.io
+   port: 5002
+   protocol: http
+   routes:
+   - name: predictor
+     # hosts: ["flow.neurohub.io"]
+     paths: ["/predictor"]
+     preserve_host: false
+     protocols:
+     - http
+     - https
+     regex_priority: 0
+     strip_path: true
+

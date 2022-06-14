@@ -4,3 +4,4 @@ This is a minimal demo of a simple drawing tool supporting the Apple Pencil in i
 
 Online demo: https://draw.neurohub.io
 
+docker run -d -p 1880:1880/tcp -p 1880:1880/udp -v ./flow_data:/data nodered/node-red:latest

@@ -8,7 +8,7 @@ RUN pip install scipy
 
 WORKDIR /app
 
-COPY model.h5 /app/model.h5
+# COPY model.h5 /app/model.h5
 
 COPY api.py /app/api.py
 

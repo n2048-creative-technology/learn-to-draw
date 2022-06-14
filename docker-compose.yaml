@@ -1,8 +1,53 @@
+version: "3.9"
+
+networks:
+  kong-net:
+    external: false
+
 volumes:
+  kong_prefix_vol:
+  kong_tmp_vol:
   mongo_data:
   flow_data:
 
 services:
+  kong.neurohub.io:
+    container_name: kong.neurohub.io
+    platform: linux/arm64
+    image: "kong:latest"
+    user: "kong"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_PREFIX: ${KONG_PREFIX:-/var/run/kong}
+      KONG_DECLARATIVE_CONFIG: "/opt/kong/kong.yaml"
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+    networks:
+      - kong-net
+    ports:
+      - "0.0.0.0:8000:8000/tcp"
+      - "0.0.0.0:8443:8443/tcp"
+      - "127.0.0.1:8001:8001/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure:5
+    read_only: true
+    volumes:
+      - kong_prefix_vol:/var/run/kong
+      - kong_tmp_vol:/tmp
+      - ./config:/opt/kong
+    security_opt:
+      - no-new-privileges
+
   draw-api.neurohub.io:
     container_name: draw-api.neurohub.io
     build: backend
@@ -16,6 +61,8 @@ services:
       - DB_PORT=27017
       - DB_NAME=drawings
       - DB_AUTH=admin 
+    networks:
+      - kong-net
 
   draw.neurohub.io:
     container_name: draw.neurohub.io
@@ -23,13 +70,19 @@ services:
     restart: always
     ports: 
       - 8080:80
+    networks:
+      - kong-net
 
   predictor.neurohub.io:
     container_name: predictor.neurohub.io
     build: predictor    
     ports: 
       - 5002:5002
+    volumes:
+      - ./predictor/models/:/app/models/
     restart: always
+    networks:
+      - kong-net
 
   mongo.neurohub.io:
     container_name: mongo.neurohub.io
@@ -41,6 +94,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=JeWSwxsp5uqerd1p
       - MONGO_INITDB_ROOT_PASSWORD=8erBv51wLlfDFf7g
+    networks:
+      - kong-net
 
   flow.neurohub.io:
     image: nodered/node-red:latest
@@ -51,5 +106,7 @@ services:
       - "1880:1880/udp"
     volumes:
       - flow_data:/data
+    networks:
+      - kong-net
 
 
