@@ -119,5 +119,5 @@ def interpolate(points, numPoints = 10):
 
 
 if __name__ == '__main__':
-     app.run(port='5002')
+     app.run()
      

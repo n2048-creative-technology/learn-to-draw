@@ -10,7 +10,8 @@ WORKDIR /app
 
 COPY ./models models
 
-COPY api.py /app/api.py
+COPY app.py /app/app.py
 
 EXPOSE 5002
-CMD python api.py
+# CMD python app.py
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
