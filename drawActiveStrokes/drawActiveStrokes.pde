@@ -122,9 +122,9 @@ void getDataAndDraw() {
   println(strokes.size() + " stroke(s) found in sketch");
   updateStrokes(strokes);
 
-  println("Retrieving expanded strokes... [" + millis() + "]");
-  strokes = loadJSONArray("https://flow.neurohub.io/expanded");
-  updateStrokes(strokes);
+  //println("Retrieving expanded strokes... [" + millis() + "]");
+  //strokes = loadJSONArray("https://flow.neurohub.io/expanded");
+  //updateStrokes(strokes);
 
   println("Retrieving predicted strokes... [" + millis() + "]");
   strokes = loadJSONArray("https://flow.neurohub.io/predictions");
@@ -149,7 +149,6 @@ void updateStrokes(JSONArray strokes) {
       }
     }
     if (listed == 0) {
-      newStroke.setBoolean("sent", false);
       activeStrokes.append(newStroke);
     }
   }
@@ -158,17 +157,16 @@ void updateStrokes(JSONArray strokes) {
 void drawStrokes() {
   for (int j = 0; j < activeStrokes.size(); j++) {
     JSONObject stroke = activeStrokes.getJSONObject(j);
-    if (stroke.getBoolean("sent")==true) {
+    
+    JSONArray points = stroke.getJSONArray("points");
+    if (points.size()<1) {
       println("stroke's already plotted");    
       continue;
     }
+    String strokeId = stroke.getString("strokeId");      
 
     drawingWidth = stroke.getFloat("width");
     drawingHeight = stroke.getFloat("height");
-
-    String strokeId = stroke.getString("strokeId");      
-
-    JSONArray points = stroke.getJSONArray("points");
 
     if (points.size()>0) {
       JSONObject point = points.getJSONObject(0);
@@ -201,7 +199,7 @@ void drawStrokes() {
       delay(200);
       penUp();
 
-      stroke.setBoolean("sent", true);
+      stroke.setJSONArray("points", new JSONArray());
       activeStrokes.setJSONObject(j, stroke);
       homed = false;
     }
